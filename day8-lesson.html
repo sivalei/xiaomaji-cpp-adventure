@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 8：函数（拆解问题） - 小蛋仔C++冒险岛</title>
+    
+    <!-- CodeMirror 5 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffb6c1 0%, #d8bfd8 50%, #dda0dd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff69b4, #da70d6);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f9f0ff;
+            border-radius: 15px;
+            border-left: 5px solid #da70d6;
+        }
+        
+        .section h2 {
+            color: #ff69b4;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h2::before {
+            content: "🎮";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .story-box {
+            background: linear-gradient(135deg, #fff0f5, #f0e6ff);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px dashed #da70d6;
+        }
+        
+        .math-thinking {
+            background: #e6e6fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #9370db;
+        }
+        
+        .math-thinking h3 {
+            color: #8a2be2;
+            margin-bottom: 10px;
+        }
+        
+        .code-editor {
+            border: 3px solid #da70d6;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .code-header {
+            background: #da70d6;
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff69b4, #da70d6);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+        
+        .btn-run {
+            background: linear-gradient(45deg, #32cd32, #228b22);
+        }
+        
+        .btn-hint {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+        }
+        
+        .output-box {
+            background: #1e1e1e;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            min-height: 100px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        
+        .quiz-box {
+            background: #fff8dc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #daa520;
+        }
+        
+        .quiz-question {
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 12px;
+            background: white;
+            border: 2px solid #daa520;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-option:hover {
+            background: #fffacd;
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.correct {
+            background: #90ee90;
+            border-color: #228b22;
+        }
+        
+        .quiz-option.wrong {
+            background: #ffb6c1;
+            border-color: #dc143c;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 5px;
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.4);
+        }
+        
+        .points {
+            font-size: 1.2em;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(45deg, #dda0dd, #da70d6);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .character {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff69b4, #da70d6);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Day 8：函数（拆解问题） 🌟</h1>
+            <p>小蛋仔学会把大任务拆成小函数！</p>
+        </div>
+        
+        <div class="section">
+            <h2>📖 故事导入</h2>
+            <div class="story-box">
+                <p>小蛋仔今天要做一个超级大的蛋糕！但是蛋糕太复杂了，小蛋仔不知道从哪里开始。</p>
+                <p>妈妈告诉小蛋仔："做蛋糕就像写代码，要把大任务拆成小步骤！"</p>
+                <p>于是，小蛋仔把做蛋糕拆成了：<strong>准备材料 → 搅拌面糊 → 烘烤 → 装饰</strong></p>
+                <p>每一个小步骤就像一个<strong>函数</strong>，组合起来就能完成大任务！</p>
+                <div style="text-align: center; margin-top: 15px;">
+                    <div class="character">🥚</div>
+                    <p><em>小蛋仔：原来复杂的事情可以这样拆解呀！</em></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🧠 数学思维：分解问题</h2>
+            <div class="math-thinking">
+                <h3>数学应用题的思考方式</h3>
+                <p>就像做数学应用题一样，我们要学会<strong>拆解问题</strong>：</p>
+                <p><strong>题目</strong>：小明有 10 个苹果，他吃了 3 个，又买了 5 个，现在有多少个苹果？</p>
+                <p><strong>拆解步骤</strong>：</p>
+                <ol>
+                    <li>先算出吃了之后剩下多少：10 - 3 = 7</li>
+                    <li>再算上新买的：7 + 5 = 12</li>
+                    <li>最终答案：12 个苹果</li>
+                </ol>
+                <p>在 C++ 中，每一个步骤都可以写成一个<strong>函数</strong>！</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>💻 C++ 概念讲解：函数</h2>
+            <p><strong>函数</strong>就像一个小助手，你给它一些数据，它帮你完成特定的任务，然后返回结果。</p>
+            
+            <h3>函数的定义</h3>
+            <pre style="background: #f0f0f0; padding: 15px; border-radius: 8px; overflow-x: auto;">
+// 函数定义：计算两个数之和
+int add(int a, int b) {
+    int result = a + b;  // 计算
+    return result;       // 返回结果
+}</pre>
+            
+            <h3>函数的调用</h3>
+            <pre style="background: #f0f0f0; padding: 15px; border-radius: 8px; overflow-x: auto;">
+int main() {
+    int sum = add(3, 5);  // 调用函数，传入 3 和 5
+    cout << "和是：" << sum << endl;  // 输出：8
+    return 0;
+}</pre>
+            
+            <h3>关键概念</h3>
+            <ul style="line-height: 2;">
+                <li><strong>函数名</strong>：add（给函数起个名字）</li>
+                <li><strong>参数</strong>：int a, int b（传入的数据）</li>
+                <li><strong>返回值</strong>：return result（返回的结果）</li>
+                <li><strong>返回类型</strong>：int（返回值的数据类型）</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 动手编码任务</h2>
+            
+            <h3>任务 1：写一个函数计算两数之和</h3>
+            <div class="code-editor">
+                <div class="code-header">
+                    <span>📝 任务 1：计算两数之和</span>
+                    <div>
+                        <button class="btn btn-hint" onclick="showHint(1)">💡 提示</button>
+                        <button class="btn btn-run" onclick="runCode(1)">▶️ 运行</button>
+                    </div>
+                </div>
+                <textarea id="code1" style="display:none;">#include <iostream>
+using namespace std;
+
+// 在这里写函数：计算两个数之和
+// 函数名：add
+// 参数：两个整数 a 和 b
+// 返回值：a + b 的和
+
+int main() {
+    int x = 10, y = 20;
+    // 调用函数，计算 x 和 y 的和
+    int result = add(x, y);
+    cout << x << " + " << y << " = " << result << endl;
+    return 0;
+}</textarea>
+                <div id="editor1"></div>
+            </div>
+            <div id="output1" class="output-box">运行结果将显示在这里...</div>
+            
+            <h3>任务 2：写一个函数判断奇偶</h3>
+            <div class="code-editor">
+                <div class="code-header">
+                    <span>📝 任务 2：判断奇偶</span>
+                    <div>
+                        <button class="btn btn-hint" onclick="showHint(2)">💡 提示</button>
+                        <button class="btn btn-run" onclick="runCode(2)">▶️ 运行</button>
+                    </div>
+                </div>
+                <textarea id="code2" style="display:none;">#include <iostream>
+using namespace std;
+
+// 在这里写函数：判断一个数是奇数还是偶数
+// 函数名：isEven
+// 参数：一个整数 n
+// 返回值：如果是偶数返回 true，否则返回 false
+// 提示：偶数能被 2 整除，即 n % 2 == 0
+
+int main() {
+    int num = 7;
+    if (isEven(num)) {
+        cout << num << " 是偶数" << endl;
+    } else {
+        cout << num << " 是奇数" << endl;
+    }
+    return 0;
+}</textarea>
+                <div id="editor2"></div>
+            </div>
+            <div id="output2" class="output-box">运行结果将显示在这里...</div>
+            
+            <h3>任务 3：自由创作 - 计算矩形面积</h3>
+            <div class="code-editor">
+                <div class="code-header">
+                    <span>📝 任务 3：计算矩形面积</span>
+                    <div>
+                        <button class="btn btn-hint" onclick="showHint(3)">💡 提示</button>
+                        <button class="btn btn-run" onclick="runCode(3)">▶️ 运行</button>
+                    </div>
+                </div>
+                <textarea id="code3" style="display:none;">#include <iostream>
+using namespace std;
+
+// 自由创作：写一个函数计算矩形的面积
+// 函数名：rectangleArea
+// 参数：宽度 width 和高度 height
+// 返回值：宽度 × 高度
+// 公式：面积 = 宽度 × 高度
+
+int main() {
+    int width = 5, height = 3;
+    int area = rectangleArea(width, height);
+    cout << "矩形面积：" << width << " × " << height << " = " << area << endl;
+    return 0;
+}</textarea>
+                <div id="editor3"></div>
+            </div>
+            <div id="output3" class="output-box">运行结果将显示在这里...</div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 小测验</h2>
+            <div class="quiz-box">
+                <div class="quiz-question">1. 在 C++ 中，函数是什么？</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">A. 一种变量</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">B. 一个可以完成特定任务的代码块</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">C. 一种数据类型</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">D. 一个循环结构</div>
+                </div>
+            </div>
+            
+            <div class="quiz-box">
+                <div class="quiz-question">2. 函数 `int add(int a, int b)` 中的 `int` 表示什么？</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">A. 函数名</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">B. 参数名</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">C. 函数返回值的类型</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">D. 参数类型</div>
+                </div>
+            </div>
+            
+            <div class="quiz-box">
+                <div class="quiz-question">3. 下面哪个关键字用于从函数返回值？</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">A. int</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">B. void</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">C. return</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">D. cout</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🌟 今日总结</h2>
+            <div style="background: #e6e6fa; padding: 20px; border-radius: 10px;">
+                <h3>今天我们学会了：</h3>
+                <ul style="line-height: 2;">
+                    <li>✅ <strong>数学思维</strong>：分解问题（把复杂问题拆成小步骤）</li>
+                    <li>✅ <strong>函数定义</strong>：如何定义一个函数（函数名、参数、返回值）</li>
+                    <li>✅ <strong>函数调用</strong>：如何调用函数并获取返回值</li>
+                    <li>✅ <strong>参数传递</strong>：如何向函数传递数据</li>
+                    <li>✅ <strong>实际应用</strong>：计算两数之和、判断奇偶、计算矩形面积</li>
+                </ul>
+                
+                <h3>重要概念：</h3>
+                <pre style="background: #fff; padding: 15px; border-radius: 8px; margin-top: 10px;">
+// 函数的基本结构
+返回类型 函数名(参数列表) {
+    函数体（执行的代码）
+    return 返回值;  // 如果有返回值
+}</pre>
+                
+                <p style="margin-top: 15px;">🎉 <strong>恭喜你！</strong>你已经掌握了函数的概念！函数是编程中非常重要的工具，能帮助我们把复杂的问题拆解成简单的步骤。</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>🎉 恭喜完成 Day 8！</h3>
+            <p>你获得了 <span class="badge">🏆 函数大师徽章</span></p>
+            <p class="points">积分：+100 分</p>
+            <p>明天我们将学习：<strong>数组（列表处理）</strong></p>
+            <button class="btn" onclick="goToNextDay()" style="margin-top: 15px;">➡️ 前往 Day 9</button>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化 CodeMirror 编辑器
+        let editors = [];
+        
+        // 初始化所有编辑器
+        for (let i = 1; i <= 3; i++) {
+            let textarea = document.getElementById('code' + i);
+            let editor = CodeMirror(document.getElementById('editor' + i), {
+                value: textarea.value,
+                mode: 'text/x-c++src',
+                theme: 'monokai',
+                lineNumbers: true,
+                indentUnit: 4,
+                indentWithTabs: false,
+                lineWrapping: true,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"}
+            });
+            editors[i] = editor;
+        }
+        
+        // C++ 模拟器（简化版）
+        function runCPPCode(code) {
+            // 这是一个简化的 C++ 模拟器
+            // 实际项目中应该使用更完整的 C++ 编译器模拟
+            
+            let output = "";
+            let hasError = false;
+            
+            try {
+                // 简单的代码分析
+                if (code.includes('cout')) {
+                    // 提取 cout 语句
+                    let coutRegex = /cout\s*<<\s*([^;]+);/g;
+                    let match;
+                    while ((match = coutRegex.exec(code)) !== null) {
+                        let content = match[1];
+                        // 简化处理：移除 << 和字符串
+                        content = content.replace(/<<\s*/g, ' ');
+                        content = content.replace(/"/g, '');
+                        output += content + '\n';
+                    }
+                }
+                
+                // 检测函数定义
+                if (code.includes('int add') && !code.includes('int add(int a, int b) {')) {
+                    output += "⚠️ 提示：请正确定义 add 函数\n";
+                }
+                
+                if (code.includes('int add(int a, int b)') && code.includes('return')) {
+                    output += "✅ 太棒了！你正确定义了 add 函数！\n";
+                    // 模拟运行
+                    output += "10 + 20 = 30\n";
+                }
+                
+                if (output === "") {
+                    output = "💡 代码已运行，但没有输出。\n💡 提示：使用 cout 来输出结果。";
+                }
+                
+            } catch (e) {
+                output = "❌ 运行错误：\n" + e.message;
+                hasError = true;
+            }
+            
+            return { output, hasError };
+        }
+        
+        // 运行代码
+        function runCode(taskNum) {
+            let code = editors[taskNum].getValue();
+            let result = runCPPCode(code);
+            
+            let outputDiv = document.getElementById('output' + taskNum);
+            outputDiv.textContent = result.output;
+            
+            if (result.hasError) {
+                outputDiv.style.color = '#ff6b6b';
+            } else {
+                outputDiv.style.color = '#ffffff';
+                // 完成任务，增加积分
+                addPoints(30);
+            }
+        }
+        
+        // 显示提示
+        function showHint(taskNum) {
+            let hints = {
+                1: "💡 提示：\n1. 函数返回类型是 int\n2. 函数名是 add\n3. 有两个参数：int a 和 int b\n4. 返回 a + b",
+                2: "💡 提示：\n1. 返回类型是 bool（真/假）\n2. 使用取模运算符 % 判断余数\n3. 如果 n % 2 == 0，则是偶数\n4. 返回 true 或 false",
+                3: "💡 提示：\n1. 函数名：rectangleArea\n2. 参数：width 和 height\n3. 返回值：width * height\n4. 不要忘记 return！"
+            };
+            
+            alert(hints[taskNum]);
+        }
+        
+        // 检查测验答案
+        function checkAnswer(element, isCorrect) {
+            // 移除同问题下所有选项的样式
+            let options = element.parentElement.children;
+            for (let opt of options) {
+                opt.classList.remove('correct', 'wrong');
+            }
+            
+            // 添加当前选项的样式
+            if (isCorrect) {
+                element.classList.add('correct');
+                alert("✅ 答对了！太棒了！");
+                addPoints(10);
+            } else {
+                element.classList.add('wrong');
+                alert("❌ 再想想哦！");
+            }
+        }
+        
+        // 积分系统
+        let points = parseInt(localStorage.getItem('day8_points') || '0');
+        
+        function addPoints(p) {
+            points += p;
+            localStorage.setItem('day8_points', points);
+            updatePointsDisplay();
+        }
+        
+        function updatePointsDisplay() {
+            let pointsElements = document.querySelectorAll('.points');
+            pointsElements.forEach(el => {
+                if (el.textContent.includes('积分')) {
+                    el.textContent = `积分：${points} 分`;
+                }
+            });
+        }
+        
+        // 页面加载时更新积分显示
+        window.onload = function() {
+            updatePointsDisplay();
+        };
+        
+        // 前往下一天
+        function goToNextDay() {
+            alert("🎉 恭喜完成 Day 8！\n积分已保存：" + points + " 分");
+            // 实际应该跳转到 day9-lesson.html
+            // window.location.href = 'day9-lesson.html';
+        }
+    </script>
+</body>
+</html>
