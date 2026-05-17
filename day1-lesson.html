@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🥚 Day 1 - 小蛋仔的C++冒险岛</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+<style>
+:root{--pink:#FF6B9D;--purple:#C44AFF;--yellow:#FFD700;--orange:#FF8C42;--mint:#00D4AA;--blue:#5B9BD5;--bg:#FFF5F9;--cardBg:#FFF;--text:#333;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;font-size:18px;background:var(--bg);color:var(--text);line-height:1.7;background-image:radial-gradient(circle at 10% 20%,rgba(255,107,157,.06) 0%,transparent 50%),radial-gradient(circle at 90% 70%,rgba(196,74,255,.05) 0%,transparent 50%)}
+h2{font-size:28px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+h3{font-size:22px;margin-bottom:12px}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+.header{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;padding:16px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 2px 12px rgba(255,107,157,.3);border-radius:0 0 var(--radius) var(--radius)}
+.logo{font-size:26px;font-weight:700;display:flex;align-items:center;gap:8px}
+.header-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.badge-display{display:flex;align-items:center;gap:6px;font-size:14px;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px}
+.points-display{font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px}
+.progress-bar-wrap{background:rgba(255,255,255,.3);border-radius:10px;height:10px;width:150px}
+.progress-bar{background:var(--yellow);height:100%;border-radius:10px;transition:width .5s}
+.day-badge{background:var(--yellow);color:#333;padding:4px 14px;border-radius:20px;font-weight:700;font-size:15px}
+.step-nav{display:flex;gap:6px;justify-content:center;padding:20px 0;flex-wrap:wrap}
+.step-btn{padding:10px 20px;border-radius:25px;border:2px solid #E0D5F0;background:#FFF;cursor:pointer;font-size:16px;font-weight:600;transition:all .3s;color:#999;font-family:inherit}
+.step-btn.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;border-color:transparent;transform:scale(1.05)}
+.step-btn.done{background:var(--mint);color:#FFF;border-color:transparent}
+.section{display:none;animation:fadeIn .5s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--cardBg);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow);margin-bottom:20px;border:2px solid #F0E6F6}
+.card:hover{box-shadow:0 6px 30px rgba(0,0,0,.12)}
+.story-card{border-left:5px solid var(--pink)}
+.concept-card{border-left:5px solid var(--purple)}
+.code-card{border-left:5px solid var(--blue)}
+.quiz-card{border-left:5px solid var(--orange)}
+.summary-card{border-left:5px solid var(--mint)}
+.story-step{cursor:pointer;padding:16px 20px;margin:8px 0;border-radius:12px;background:#FFF0F5;border:2px dashed var(--pink);transition:all .3s;display:flex;align-items:flex-start;gap:14px}
+.story-step:hover{transform:translateX(5px);background:#FFE4EE}
+.story-step .step-num{font-size:28px;min-width:40px;text-align:center}
+.story-step.revealed{background:#FFE4EE;border-style:solid;border-color:var(--pink)}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab-btn{padding:10px 22px;border-radius:25px;border:2px solid #E0D5F0;background:#FFF;cursor:pointer;font-size:17px;font-weight:600;transition:all .3s;font-family:inherit}
+.tab-btn.active{background:linear-gradient(135deg,var(--purple),#A855F7);color:#FFF;border-color:transparent}
+.tab-content{display:none;animation:fadeIn .3s}
+.tab-content.active{display:block}
+.code-block{background:#2D2D3F;color:#F8F8F2;padding:20px;border-radius:12px;font-size:15px;overflow-x:auto;line-height:1.8;margin:10px 0}
+.code-block code{color:#F8F8F2}
+.code-compare-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+.code-compare-table th{background:var(--purple);color:#FFF;padding:10px 14px;text-align:left}
+.code-compare-table td{padding:10px 14px;border-bottom:1px solid #E0D5F0}
+.code-compare-table tr:hover{background:#F5EEFF}
+.editor-layout{display:flex;gap:20px;flex-wrap:wrap}
+.task-panel{flex:0 0 320px;background:#FAF0FF;border-radius:12px;padding:20px}
+.task-panel h4{font-size:18px;margin-bottom:10px;color:var(--purple)}
+.task-item{display:none}
+.task-item.active{display:block}
+.task-item p{margin:6px 0;font-size:16px}
+.task-item .hint{color:#999;font-size:14px;margin-top:8px;font-style:italic}
+.editor-panel{flex:1;min-width:400px;border:2px solid #E0D5F0;border-radius:12px;overflow:hidden}
+.CodeMirror{height:260px!important;font-size:16px!important;font-family:"Fira Code","Consolas",monospace!important}
+.output-panel{background:#1E1E2E;color:#00FF88;padding:14px 18px;font-size:16px;font-family:"Fira Code","Consolas",monospace;min-height:60px;max-height:150px;overflow-y:auto;border-top:2px solid #333}
+.btn-row{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
+.btn{padding:10px 28px;border-radius:25px;border:none;cursor:pointer;font-size:17px;font-weight:600;transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,.15)}
+.btn:active{transform:translateY(0)}
+.btn-run{background:linear-gradient(135deg,var(--mint),#00B894);color:#FFF}
+.btn-hint{background:#FFF;border:2px solid var(--yellow);color:#B8860B}
+.btn-task{background:#FFF;border:2px solid #E0D5F0;color:#666;margin:4px}
+.btn-task.active{background:var(--purple);color:#FFF;border-color:transparent}
+.btn-prev,.btn-next{background:linear-gradient(135deg,var(--blue),#4A90D9);color:#FFF}
+.quiz-question{padding:18px;margin:10px 0;background:#FFF9F0;border-radius:12px;border:2px solid #FFE4CC}
+.quiz-question .q-title{font-weight:700;font-size:18px;margin-bottom:10px}
+.quiz-option{padding:12px 16px;margin:6px 0;border-radius:10px;border:2px solid #E0D5F0;cursor:pointer;transition:all .2s;font-size:16px}
+.quiz-option:hover{border-color:var(--orange);background:#FFF5EE}
+.quiz-option.correct{background:#D4EDDA;border-color:#28A745!important;animation:pulse .3s}
+.quiz-option.wrong{background:#F8D7DA;border-color:#DC3545!important}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+.quiz-input{padding:10px 16px;border:2px solid #E0D5F0;border-radius:10px;font-size:16px;width:120px;text-align:center;font-family:"Fira Code",monospace}
+.result-banner{text-align:center;padding:16px;margin:12px 0;border-radius:12px;font-size:20px;font-weight:700}
+.result-banner.great{background:#D4EDDA;color:#155724}
+.result-banner.good{background:#FFF3CD;color:#856404}
+.knowledge-card{background:linear-gradient(135deg,#FFF,#FFF5F9);padding:24px;border-radius:12px;border:3px solid var(--pink);text-align:center;max-width:320px;margin:0 auto}
+.achievement{display:flex;align-items:center;gap:16px;justify-content:center;padding:20px;margin:10px 0;font-size:22px;font-weight:700}
+.badge-icon{font-size:50px;animation:bounceIn .6s}
+@keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.tomorrow-preview{background:linear-gradient(135deg,#F0E6F6,#FFF0F5);padding:20px;border-radius:12px;text-align:center}
+@media(max-width:768px){.editor-layout{flex-direction:column}.task-panel{flex:auto}.header{flex-direction:column;text-align:center}h2{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo"><span style="font-size:36px">🥚</span>小蛋仔C++冒险岛</div>
+<div class="header-right">
+<div class="day-badge">📅 Day 1 / 240</div>
+<div class="progress-bar-wrap"><div class="progress-bar" id="dayProgress" style="width:0.4%"></div></div>
+<div class="points-display"><span>💰</span><span id="pointsDisplay">0</span>分</div>
+<div class="badge-display" id="badgeDisplay"><span>🎖️</span>还没有徽章</div>
+</div>
+</div>
+<div class="container">
+<div class="step-nav">
+<button class="step-btn active" onclick="showSection(0)">🎬 故事导入</button>
+<button class="step-btn" onclick="showSection(1)">📖 概念讲解</button>
+<button class="step-btn" onclick="showSection(2)">⌨️ 动手编码</button>
+<button class="step-btn" onclick="showSection(3)">✅ 小测验</button>
+<button class="step-btn" onclick="showSection(4)">🌟 今日总结</button>
+</div>
+
+<div class="section active" id="section0">
+<div class="card story-card">
+<h2>🎬 故事导入：小蛋仔收到神秘邀请函</h2>
+<p style="color:#888;margin-bottom:14px">点击每一段展开故事</p>
+<div class="story-step" onclick="revealStory(this)">
+<div class="step-num">1️⃣</div>
+<div><p>小蛋仔今天特别兴奋！因为她收到了来自「<strong>代码王国</strong>」的邀请函！</p></div>
+</div>
+<div class="story-step" onclick="revealStory(this)">
+<div class="step-num">2️⃣</div>
+<div><p>邀请函写着：</p>
+<div style="background:#FFF0F5;padding:14px;border-radius:10px;margin:8px 0">"亲爱的小蛋仔，欢迎来到代码王国！<br>在这里，你可以用<strong>C++魔法</strong>建造世界！<br>试试这个魔法咒语：<code style="background:#FFE4EE;color:var(--pink);padding:4px 10px;border-radius:4px;font-size:18px">cout &lt;&lt; "Hello World!";</code>"</div>
+</div>
+</div>
+<div class="story-step" onclick="revealStory(this)">
+<div class="step-num">3️⃣</div>
+<div><p>小蛋仔决定试试这个神奇的魔法咒语！</p><p style="color:var(--pink);font-weight:700;font-size:18px">🐣 让我们也来试试吧！</p></div>
+</div>
+<div style="text-align:center;margin-top:20px">
+<button class="btn btn-next" onclick="showSection(1)">📖 开始学习概念 →</button>
+</div>
+</div>
+</div>
+
+<div class="section" id="section1">
+<div class="card concept-card">
+<h2>📖 概念讲解：编程就是搭建世界</h2>
+<div class="tabs">
+<button class="tab-btn active" onclick="switchTab(0)">📦 基本概念</button>
+<button class="tab-btn" onclick="switchTab(1)">🔍 逐行解读</button>
+<button class="tab-btn" onclick="switchTab(2)">🎮 游戏联想</button>
+</div>
+<div class="tab-content active" id="tab0">
+<h3>💡 编程 = 在我的世界里搭建东西</h3>
+<p>🧱 一个方块 = <strong>一行代码</strong></p>
+<p>🧱🧱🧱 一堵墙 = <strong>一组代码</strong></p>
+<p>🏠 一座房子 = <strong>一个程序</strong></p>
+<h3 style="margin-top:20px">💡 你的第一个C++程序</h3>
+<div class="code-block"><code>#include &lt;iostream&gt;          // 📦 打开工具背包
+using namespace std;         // 🏷️ 使用标准工具
+int main() {                 // 🚪 程序入口大门
+    cout &lt;&lt; "Hello World!";  // 📢 在屏幕上说话！
+    return 0;               // ✅ 任务完成！
+}</code></div>
+<p style="color:#888;font-size:15px;margin-top:8px">🎯 这就是一个完整的C++程序！只有5个部分！</p>
+</div>
+<div class="tab-content" id="tab1">
+<h3>🔍 逐行解读 - 用蛋仔的比喻</h3>
+<table class="code-compare-table">
+<tr><th>代码</th><th>蛋仔比喻</th><th>说明</th></tr>
+<tr><td><code>#include &lt;iostream&gt;</code></td><td>🎒 背上工具背包</td><td>iostream里面有输入输出工具</td></tr>
+<tr><td><code>using namespace std;</code></td><td>🏠 住在蛋仔小镇</td><td>告诉电脑我们使用标准工具区</td></tr>
+<tr><td><code>int main()</code></td><td>🚪 进入关卡大门</td><td>每个C++程序从这里开始！</td></tr>
+<tr><td><code>{ }</code> 花括号</td><td>🏟️ 关卡边界</td><td>所有代码要放在花括号里面</td></tr>
+<tr><td><code>cout &lt;&lt; "Hello World!";</code></td><td>📢 蛋仔用喇叭喊话</td><td>把文字输出到屏幕上！</td></tr>
+<tr><td><code>return 0;</code></td><td>✅ 任务完成提交</td><td>告诉电脑程序正常结束了</td></tr>
+<tr><td><code>;</code> 分号</td><td>⏸️ 这句话说完啦</td><td>像句号一样，每句结束加</td></tr>
+</table>
+<div style="margin-top:12px;background:#FFF0F5;padding:12px;border-radius:10px;font-size:16px">
+<p>🎯 <strong>记住</strong>：分号（<code>;</code>）就像句子末尾的句号，<strong>每行指令后面都要写</strong>！</p>
+</div>
+</div>
+<div class="tab-content" id="tab2">
+<h3>🎮 蛋仔派对里的cout</h3>
+<table class="code-compare-table">
+<tr><th>蛋仔派对</th><th>C++代码</th></tr>
+<tr><td>💬 聊天框</td><td><code>cout</code></td></tr>
+<tr><td>📝 你要说的话</td><td><code>"Hello World!"</code></td></tr>
+<tr><td>📤 按发送键</td><td><code>;</code></td></tr>
+</table>
+<h3 style="margin-top:20px">⛏️ 我的世界里的程序</h3>
+<table class="code-compare-table">
+<tr><th>我的世界</th><th>C++程序</th></tr>
+<tr><td>🌍 一个世界存档</td><td>一个程序文件</td></tr>
+<tr><td>🚪 出生点</td><td><code>int main()</code> 程序入口</td></tr>
+<tr><td>📝 命令方块</td><td><code>cout &lt;&lt;</code> 执行指令</td></tr>
+<tr><td>✅ 完成任务</td><td><code>return 0;</code> 程序结束</td></tr>
+</table>
+</div>
+<div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+<button class="btn btn-prev" onclick="showSection(0)">← 🎬 回看故事</button>
+<button class="btn btn-next" onclick="showSection(2)">⌨️ 动手写代码 →</button>
+</div>
+</div>
+</div>
+
+<div class="section" id="section2">
+<div class="card code-card">
+<h2>⌨️ 动手编码：小蛋仔的第一行魔法咒语</h2>
+<div class="editor-layout">
+<div class="task-panel">
+<h4>📋 任务列表</h4>
+<div style="margin-bottom:12px">
+<button class="btn btn-task active" onclick="switchTask(0)">1️⃣ 跟我敲</button>
+<button class="btn btn-task" onclick="switchTask(1)">2️⃣ 改名字</button>
+<button class="btn btn-task" onclick="switchTask(2)">3️⃣ 自由创作</button>
+</div>
+<div class="task-item active" id="taskItem0">
+<p>🎯 <strong>任务一：跟着敲一遍</strong></p>
+<p>在右边编辑器里输入以下代码，点击<strong>运行</strong>：</p>
+<div class="code-block"><code>#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    cout &lt;&lt; "Hello World!";
+    return 0;
+}</code></div>
+<p class="hint">💡 cout 后面的箭头是 &lt;&lt;，分号 ; 不能忘哦~</p>
+</div>
+<div class="task-item" id="taskItem1">
+<p>🎯 <strong>任务二：变身蛋仔！</strong></p>
+<p>把 Hello World 改成你的蛋仔名字：</p>
+<div class="code-block"><code>cout &lt;&lt; "大家好！我是蛋仔小彩虹！" &lt;&lt; endl;
+cout &lt;&lt; "欢迎来我的代码世界！" &lt;&lt; endl;</code></div>
+<p class="hint">💡 endl 就是换行，像在聊天框里按回车！</p>
+</div>
+<div class="task-item" id="taskItem2">
+<p>🎯 <strong>任务三：自由创作</strong></p>
+<p>写程序介绍你和喜欢的游戏：</p>
+<div class="code-block"><code>cout &lt;&lt; "我是三年级的小蛋仔！" &lt;&lt; endl;
+cout &lt;&lt; "我喜欢蛋仔派对！" &lt;&lt; endl;
+cout &lt;&lt; "我也喜欢我的世界！" &lt;&lt; endl;</code></div>
+<p class="hint">💡 可以随便写你想说的话！</p>
+</div>
+</div>
+<div class="editor-panel">
+<textarea id="codeEditor">#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    cout &lt;&lt; "Hello World!";
+    return 0;
+}</textarea>
+<div class="output-panel" id="outputPanel">
+<span style="color:#888">👇 点击"运行"按钮查看程序输出...</span>
+</div>
+<div style="padding:12px;display:flex;gap:10px;flex-wrap:wrap">
+<button class="btn btn-run" onclick="runCode()">🚀 运行代码</button>
+<button class="btn btn-hint" onclick="showHint()">💡 查看提示</button>
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="resetCode()">🔄 重置代码</button>
+</div>
+</div>
+</div>
+<div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+<button class="btn btn-prev" onclick="showSection(1)">← 📖 回看讲解</button>
+<button class="btn btn-next" onclick="showSection(3)">✅ 开始测验 →</button>
+</div>
+</div>
+</div>
+
+<div class="section" id="section3">
+<div class="card quiz-card">
+<h2>✅ 小测验：看看你学会了多少？</h2>
+<div class="quiz-question" id="q1">
+<div class="q-title">1️⃣ C++程序从哪里开始执行？</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',1)">A. start()</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',1)">B. main()</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',1)">C. begin()</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',1)">D. run()</div>
+</div>
+<div class="quiz-question" id="q2">
+<div class="q-title">2️⃣ 向屏幕输出文字用哪个？</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',2)">A. print</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',2)">B. cout</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',2)">C. say</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',2)">D. output</div>
+</div>
+<div class="quiz-question" id="q3">
+<div class="q-title">3️⃣ C++语句结尾用什么符号？</div>
+<div class="quiz-option" onclick="checkChoice(this,'C',3)">A. 句号。</div>
+<div class="quiz-option" onclick="checkChoice(this,'C',3)">B. 逗号,</div>
+<div class="quiz-option" onclick="checkChoice(this,'C',3)">C. 分号;</div>
+<div class="quiz-option" onclick="checkChoice(this,'C',3)">D. 点号.</div>
+</div>
+<div class="quiz-question" id="q4">
+<div class="q-title">4️⃣ 补全代码，让蛋仔说出"C++真好玩！"</div>
+<div class="code-block"><code>#include &lt;iostream&gt;
+using namespace std;
+int main() {
+    <input class="quiz-input" id="fillBlank" placeholder="填这里" maxlength="10"> &lt;&lt; "C++真好玩！";
+    return 0;
+}</code></div>
+<button class="btn" style="background:var(--orange);color:#FFF;margin-top:8px" onclick="checkFill()">✅ 提交答案</button>
+<p id="fillResult" style="margin-top:8px;font-weight:700"></p>
+</div>
+<div class="quiz-question" id="q5">
+<div class="q-title">5️⃣ 写程序介绍你自己（至少3行）</div>
+<textarea id="quizEditor" style="width:100%;height:120px;background:#2D2D3F;color:#F8F8F2;padding:12px;border-radius:8px;font-family:Consolas,monospace;font-size:15px;border:none;resize:vertical"></textarea>
+<button class="btn btn-run" style="margin-top:8px" onclick="runQuizCode()">🚀 运行检查</button>
+<div id="quizCodeResult" style="margin-top:8px;font-weight:700"></div>
+</div>
+<div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+<button class="btn btn-prev" onclick="showSection(2)">← ⌨️ 再练练</button>
+<button class="btn btn-next" onclick="completeQuiz()">🎊 提交全部测验 →</button>
+</div>
+</div>
+</div>
+
+<div class="section" id="section4">
+<div class="card summary-card">
+<h2>🌟 今日总结：恭喜完成 Day 1！</h2>
+<div class="knowledge-card">
+<h4 style="font-size:22px;color:var(--pink)">📎 今日知识卡片</h4>
+<div class="code-block" style="text-align:left"><code><span style="color:#888">// Day 1：小蛋仔的第一行魔法</span>
+<span style="color:#FF79C6">cout</span> &lt;&lt; <span style="color:#F1FA8C">"想说的话"</span>;
+<span style="color:#888">// 分号 = 句号，每句都要写！</span>
+<span style="color:#8BE9FD">int</span> <span style="color:#50FA7B">main</span>() { <span style="color:#888">// 程序入口</span>
+    <span style="color:#888">// 你的代码写这里</span>
+}</code></div>
+</div>
+<div class="achievement">
+<div class="badge-icon">🌱</div>
+<div><p>获得「<strong>新芽蛋仔</strong>」徽章！</p><p style="font-size:16px;color:#888">累计积分：<strong id="achievementPoints">50</strong> 分</p></div>
+</div>
+<div style="text-align:center;margin:16px 0"><p style="font-size:28px;color:var(--pink)">✨ Day 1 +50 积分 ✨</p></div>
+<div class="tomorrow-preview">
+<h3>🎯 明日预告：魔法宝箱 — 变量</h3>
+<p>变量就像蛋仔的<strong>宝箱</strong>🧰，可以存金币、生命值、名字...</p>
+<p>记得<strong>明天同一时间</strong>回来继续冒险哦！</p>
+<p style="font-size:22px;margin-top:10px">🐣 明天见，小蛋仔！👋</p>
+</div>
+<div style="text-align:center;margin-top:20px">
+<button class="btn" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF" onclick="resetAll()">🔄 重新学习 Day 1</button>
+</div>
+</div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+<script>
+// 全局状态
+var currentSection = 0, currentTask = 0, currentTab = 0;
+var quizAnswers = {q1:false,q2:false,q3:false,q4:false,q5:false};
+var quizScores = {};
+var codeEditor;
+
+var taskTemplates = [
+  '#include <iostream>\nusing namespace std;\nint main() {\n    cout << "Hello World!";\n    return 0;\n}',
+  '#include <iostream>\nusing namespace std;\nint main() {\n    cout << "大家好！我是蛋仔小彩虹！" << endl;\n    cout << "欢迎来我的代码世界！" << endl;\n    return 0;\n}',
+  '#include <iostream>\nusing namespace std;\nint main() {\n    cout << "我是三年级的小蛋仔！" << endl;\n    cout << "我喜欢蛋仔派对！" << endl;\n    return 0;\n}'
+];
+
+// 初始化 CodeMirror
+window.addEventListener('load',function(){
+  codeEditor = CodeMirror.fromTextArea(document.getElementById('codeEditor'),{
+    mode:'text/x-c++src', theme:'dracula', lineNumbers:true,
+    indentUnit:4, tabSize:4, lineWrapping:true, viewportMargin:Infinity
+  });
+  codeEditor.setSize(null,260);
+  loadProgress();
+});
+
+// 步骤导航
+function showSection(idx){
+  currentSection = idx;
+  document.querySelectorAll('.section').forEach(function(s,i){s.classList.toggle('active',i===idx)});
+  document.querySelectorAll('.step-btn').forEach(function(b,i){b.classList.toggle('active',i===idx)});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// 故事展开
+function revealStory(el){el.classList.add('revealed')}
+
+// 概念标签页
+function switchTab(idx){
+  currentTab = idx;
+  document.querySelectorAll('.tab-btn').forEach(function(b,i){b.classList.toggle('active',i===idx)});
+  document.querySelectorAll('.tab-content').forEach(function(c,i){c.classList.toggle('active',i===idx)});
+}
+
+// 编码任务切换
+function switchTask(idx){
+  currentTask = idx;
+  document.querySelectorAll('.btn-task').forEach(function(b,i){b.classList.toggle('active',i===idx)});
+  document.querySelectorAll('.task-item').forEach(function(t,i){t.classList.toggle('active',i===idx)});
+  if(codeEditor) codeEditor.setValue(taskTemplates[idx]);
+}
+function resetCode(){
+  if(codeEditor) codeEditor.setValue(taskTemplates[currentTask]);
+  document.getElementById('outputPanel').innerHTML = '<span style="color:#888">点击"运行"按钮查看输出...</span>';
+}
+
+// C++ 模拟运行器
+function runCpp(code){
+  var output = [];
+  var vars = {};
+  var lines = code.split('\n');
+  for(var i = 0; i < lines.length; i++){
+    var line = lines[i].trim();
+    if(!line || line.startsWith('//') || line.startsWith('#include') ||
+       line.startsWith('using') || line === 'int main() {' || line === '{' ||
+       line.startsWith('return ') || line === '}') continue;
+    
+    // 变量定义
+    var intMatch = line.match(/^int\s+(\w+)\s*=\s*([^;]+);/);
+    if(intMatch){ vars[intMatch[1]] = parseInt(intMatch[2]) || 0; continue; }
+    
+    // cout 语句
+    var coutMatch = line.match(/cout\s*<<(.+);/);
+    if(coutMatch){
+      var parts = coutMatch[1].split('<<');
+      for(var j = 0; j < parts.length; j++){
+        var part = parts[j].trim();
+        if(part === 'endl'){ output.push('\n'); }
+        else if(part.startsWith('"') && part.endsWith('"')){ output.push(part.slice(1,-1)); }
+        else if(part.length > 1 && part.startsWith('"') && parts[j+1] && parts[j+1].trim().startsWith('"')){
+          // 跨分割的字符串
+          var combined = part.slice(1) + parts[j+1].trim().slice(0,-1);
+          output.push(combined);
+          j++; // 跳过下一个部分
+        }
+        else if(vars.hasOwnProperty(part)){ output.push(String(vars[part])); }
+      }
+    }
+  }
+  return output.join('');
+}
+
+function runCode(){
+  var code = codeEditor ? codeEditor.getValue() : '';
+  var output = runCpp(code);
+  var panel = document.getElementById('outputPanel');
+  if(output.trim()){
+    panel.innerHTML = '<span style="color:#00FF88">' + escHtml(output) + '</span>';
+  } else {
+    panel.innerHTML = '<span style="color:#FF6B6B">程序没有输出！检查代码~</span>';
+  }
+  // 任务完成加分
+  if(!localStorage.getItem('eggy_day1_code_run') && code.includes('cout') && code.includes(';')){
+    addPoints(10);
+    localStorage.setItem('eggy_day1_code_run','true');
+    panel.innerHTML += '<br><span style="color:#FFD700;font-size:14px">🎉 首次运行代码，+10积分！</span>';
+  }
+}
+
+function showHint(){
+  document.getElementById('outputPanel').innerHTML = '<div style="color:#FFD700"><strong>提示：</strong>1. 确保 cout 的箭头是 &lt;&lt; 2. 字符串用双引号 3. 每行结束要分号</div>';
+}
+
+// 测验
+function checkChoice(el,correct,q){
+  if(quizAnswers['q'+q]) return;
+  var allOpts = el.parentElement.querySelectorAll('.quiz-option');
+  if(el.textContent.indexOf(correct) !== -1){
+    el.classList.add('correct');
+    quizAnswers['q'+q] = true;
+    quizScores['q'+q] = 5;
+    el.innerHTML += '<span style="float:right"> 正确!</span>';
+  } else {
+    el.classList.add('wrong');
+    quizAnswers['q'+q] = false;
+    el.innerHTML += '<span style="float:right"> 再想想</span>';
+    allOpts.forEach(function(o){if(o.textContent.indexOf(correct)!==-1) o.classList.add('correct')});
+  }
+  allOpts.forEach(function(o){o.style.pointerEvents='none'});
+}
+
+function checkFill(){
+  var ans = document.getElementById('fillBlank').value.trim();
+  var res = document.getElementById('fillResult');
+  if(ans === 'cout'){
+    res.innerHTML = ' 正确！加10分！'; res.style.color = '#28A745';
+    quizAnswers.q4 = true; quizScores.q4 = 10;
+    document.getElementById('fillBlank').disabled = true;
+  } else {
+    res.innerHTML = ' 提示：输出工具是 cout（4个字母）'; res.style.color = '#DC3545';
+  }
+}
+
+function runQuizCode(){
+  var code = document.getElementById('quizEditor').value;
+  var res = document.getElementById('quizCodeResult');
+  if(code.includes('cout') && code.includes(';') && code.length > 20){
+    res.innerHTML = ' 代码看起来不错！写出了完整程序！+10分';
+    res.style.color = '#28A745';
+    quizAnswers.q5 = true; quizScores.q5 = 10;
+  } else if(code.length > 5){
+    res.innerHTML = ' 有进步！确保包含 cout 和分号就完美了！+5分';
+    res.style.color = '#FF8C00';
+    quizAnswers.q5 = true; quizScores.q5 = 5;
+  } else {
+    res.innerHTML = ' 再加把劲！写至少一行 cout << "你的介绍";';
+    res.style.color = '#DC3545';
+  }
+}
+
+function completeQuiz(){
+  var total = 0;
+  for(var k in quizScores) total += quizScores[k] || 0;
+  var msg = '测验得分: ' + total + '/40! ';
+  if(total >= 30) msg += '太棒了！';
+  else if(total >= 15) msg += '不错哦！';
+  else msg += '继续加油！';
+  alert(msg);
+  saveProgress();
+  showSection(4);
+  updateAchievement();
+}
+
+// 积分系统
+function getPoints(){return parseInt(localStorage.getItem('eggy_cpp_points') || '0')}
+function addPoints(amt){var p = getPoints() + amt; localStorage.setItem('eggy_cpp_points',String(p)); document.getElementById('pointsDisplay').textContent = p}
+function saveProgress(){localStorage.setItem('eggy_cpp_day1_done','true'); if(getPoints() === 0) addPoints(50); document.getElementById('dayProgress').style.width = '0.4%'}
+function loadProgress(){var p = getPoints(); document.getElementById('pointsDisplay').textContent = p; document.getElementById('achievementPoints').textContent = p}
+function updateAchievement(){var p = getPoints(); document.getElementById('badgeDisplay').innerHTML = '<span>🌱</span> 新芽蛋仔'; document.getElementById('achievementPoints').textContent = p}
+function resetAll(){if(confirm('清除所有进度，重新学习？')){localStorage.clear();location.reload()}}
+function escHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+</script>
+</body>
+</html>
