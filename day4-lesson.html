@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title> Day 4 - 运算符与数学计算</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+<style>
+:root{--pink:#FF6B9D;--purple:#C44AFF;--yellow:#FFD700;--mint:#00D4AA;--blue:#5B9BD5;--orange:#FF8C42;--bg:#FFF5F9;--cardBg:#FFF;--text:#333;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;font-size:18px;background:var(--bg);color:var(--text);line-height:1.7}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+.header{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;padding:16px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 2px 12px rgba(255,107,157,.3);border-radius:0 0 var(--radius) var(--radius)}
+.logo{font-size:26px;font-weight:700;display:flex;align-items:center;gap:8px}
+.header-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.points-display{font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px}
+.progress-bar-wrap{background:rgba(255,255,255,.3);border-radius:10px;height:10px;width:150px}
+.progress-bar{background:var(--yellow);height:100%;border-radius:10px;transition:width .5s}
+.day-badge{background:var(--yellow);color:#333;padding:4px 14px;border-radius:20px;font-weight:700;font-size:15px}
+.step-nav{display:flex;gap:6px;justify-content:center;padding:20px 0;flex-wrap:wrap}
+.step-btn{padding:10px 20px;border-radius:25px;border:2px solid #E0D5F0;background:#FFF;cursor:pointer;font-size:16px;font-weight:600;transition:all .3s;color:#999;font-family:inherit}
+.step-btn.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;border-color:transparent;transform:scale(1.05)}
+.section{display:none;animation:fadeIn .5s ease}.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--cardBg);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow);margin-bottom:20px;border:2px solid #F0E6F6}
+.story-step{cursor:pointer;padding:16px 20px;margin:8px 0;border-radius:12px;background:#FFF0F5;border:2px dashed var(--pink);transition:all .3s;display:flex;align-items:flex-start;gap:14px}
+.story-step:hover{transform:translateX(5px);background:#FFE4EE}
+.story-step.revealed{background:#FFE4EE;border-style:solid;border-color:var(--pink)}
+.code-block{background:#2D2D3F;color:#F8F8F2;padding:20px;border-radius:12px;font-size:15px;overflow-x:auto;line-height:1.8;margin:10px 0;font-family:"Fira Code",Consolas,monospace}
+.quiz-question{padding:18px;margin:10px 0;background:#FFF9F0;border-radius:12px;border:2px solid #FFE4CC}
+.quiz-option{padding:12px 16px;margin:6px 0;border-radius:10px;border:2px solid #E0D5F0;cursor:pointer;transition:all .2s;font-size:16px}
+.quiz-option:hover{border-color:var(--orange);background:#FFF5EE}
+.quiz-option.correct{background:#D4EDDA;border-color:#28A745!important}
+.quiz-option.wrong{background:#F8D7DA;border-color:#DC3545!important}
+.quiz-input{padding:10px 16px;border:2px solid #E0D5F0;border-radius:10px;font-size:16px;width:120px;text-align:center;font-family:monospace}
+.btn{padding:10px 28px;border-radius:25px;border:none;cursor:pointer;font-size:17px;font-weight:600;transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+.btn-run{background:linear-gradient(135deg,var(--mint),#00B894);color:#FFF}
+.btn-hint{background:#FFF;border:2px solid var(--yellow);color:#B8860B}
+.btn-next{background:linear-gradient(135deg,var(--blue),#4A90D9);color:#FFF}
+.output-panel{background:#1E1E2E;color:#00FF88;padding:14px 18px;font-size:16px;font-family:"Fira Code",monospace;min-height:60px;max-height:150px;overflow-y:auto;border-top:2px solid #333}
+@media(max-width:768px){.header{flex-direction:column;text-align:center}.step-nav{flex-direction:column;align-items:center}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="logo"><span style="font-size:36px">🥚</span>小蛋仔C++冒险岛</div>
+  <div class="header-right">
+    <div class="day-badge">📅 Day 4 / 14</div>
+    <div class="progress-bar-wrap"><div class="progress-bar" style="width:28.571428571428573%"></div></div>
+    <div class="points-display">💰 <span id="pointsDisplay">0</span>分</div>
+  </div>
+</div>
+<div class="container">
+  <div class="step-nav">
+    <button class="step-btn active" onclick="showSection(0)">🎬 故事</button>
+    <button class="step-btn" onclick="showSection(1)">📖 概念</button>
+    <button class="step-btn" onclick="showSection(2)">⌨️ 编码</button>
+    <button class="step-btn" onclick="showSection(3)">✅ 测验</button>
+  </div>
+
+  <!-- 故事 -->
+  <div class="section active" id="section0">
+    <div class="card" style="border-left:5px solid var(--pink)">
+      <h2>🎬 故事导入</h2>
+      <div style="padding:10px">小蛋仔来到了「代码王国的数学塔」！塔里的每一个符号（+ - * /）都是一把钥匙，组合起来可以打开任何宝箱！<br><br>就像做数学题一样，C++ 也能做计算！</div>
+      <div style="text-align:center;margin-top:20px"><button class="btn btn-next" onclick="showSection(1)">📖 学习概念 →</button></div>
+    </div>
+  </div>
+
+  <!-- 概念 -->
+  <div class="section" id="section1">
+    <div class="card" style="border-left:5px solid var(--purple)">
+      <h2>📖 概念讲解</h2>
+      <div style="padding:10px"><div class="code-block"><code>int a=10, b=3;<br>cout << a+b;  // 13<br>cout << a-b;  // 7<br>cout << a*b;  // 30<br>cout << a/b;  // 3（整数除法！）<br>cout << a%b;  // 1（余数）</code></div><p style="margin-top:10px">💡 整数除法会舍去小数！3/2 得 1，不是 1.5！</p></div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="showSection(0)">← 🎬 回看</button>
+        <button class="btn btn-next" onclick="showSection(2)">⌨️ 动手编码 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编码 -->
+  <div class="section" id="section2">
+    <div class="card" style="border-left:5px solid var(--blue)">
+      <h2>⌨️ 动手编码</h2>
+      <div style="padding:10px">
+        <textarea id="codeEditor" style="width:100%;height:200px;background:#282a36;color:#f8f8f2;font-family:monospace;font-size:15px;padding:10px;border-radius:8px;border:none">#include <iostream>
+using namespace std;
+int main() {
+    int a=10, b=3;
+    cout << "a+b=" << a+b << endl;
+    cout << "a/b=" << a/b << endl;
+    return 0;
+}</textarea>
+        <div class="output-panel" id="outputPanel"><span style="color:#888">点击运行查看输出...</span></div>
+        <div style="padding:12px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-run" onclick="runCode()">🚀 运行代码</button>
+          <button class="btn btn-hint" onclick="showHint()">💡 提示</button>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:20px">
+        <button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="showSection(1)">← 📖 回看</button>
+        <button class="btn btn-next" onclick="showSection(3)">✅ 开始测验 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 测验 -->
+  <div class="section" id="section3">
+    <div class="card" style="border-left:5px solid var(--orange)">
+      <h2>✅ 小测验</h2>
+      <div style="padding:10px"><div class="quiz-question"><div style="font-weight:700;margin-bottom:10px">1️⃣ 10/3 的结果是多少？</div><div class="quiz-option" onclick="checkChoice(this,'A',1)">A. 3</div><div class="quiz-option" onclick="checkChoice(this,'A',1)">B. 3.333</div><div class="quiz-option" onclick="checkChoice(this,'A',1)">C. 1</div></div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+<script>
+let editor, currentSection = 0;
+window.addEventListener('load',function(){
+  if(document.getElementById('codeEditor')){
+    editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'),{mode:'text/x-c++src',theme:'dracula',lineNumbers:true,indentUnit:4});
+    editor.setSize(null,220);
+    let p = parseInt(localStorage.getItem('eggy_points')||'0');
+    document.getElementById('pointsDisplay').textContent = p;
+  }
+});
+function showSection(i){currentSection=i;document.querySelectorAll('.section').forEach((s,j)=>s.classList.toggle('active',j===i));document.querySelectorAll('.step-btn').forEach((b,j)=>b.classList.toggle('active',j===i));window.scrollTo({top:0,behavior:'smooth'});}
+function revealStory(el){el.classList.add('revealed')}
+function runCode(){
+  if(!editor)return;
+  let code=editor.getValue(),output=[],vars={};
+  code.split('\n').forEach(line=>{
+    line=line.trim();
+    if(!line||line.startsWith('//')||line.startsWith('#')||line.startsWith('using')||line==='int main(){'||line==='{'||line.startsWith('return')||line==='}')return;
+    let m1=line.match(/^int\s+(\w+)\s*=\s*(\d+)/);
+    if(m1){vars[m1[1]]=parseInt(m1[2]);return;}
+    let m2=line.match(/^string\s+(\w+)\s*=\s*"([^"]*)"/);
+    if(m2){vars[m2[1]]=m2[2];return;}
+    let m3=line.match(/cin\s*>>\s*(\w+)/);
+    if(m3){vars[m3[1]]=prompt('请输入 '+m3[1]+':')||'0';return;}
+    let m4=line.match(/cout\s*<<(.+);/);
+    if(m4){
+      let parts=m4[1].split('<<').map(p=>p.trim());
+      parts.forEach(p=>{
+        if(p==='endl')output.push('\n');
+        else if(p.startsWith('"')&&p.endsWith('"'))output.push(p.slice(1,-1));
+        else if(vars.hasOwnProperty(p))output.push(vars[p]);
+        else if(p.match(/^[\d\.+*/-]/))output.push(eval(p.replace(/(\w+)/g,m=>vars[m]||m)));
+      });
+    }
+  });
+  let panel=document.getElementById('outputPanel');
+  if(panel)panel.innerHTML=output.length?'<span style="color:#00FF88">'+output.join('').replace(/\n/g,'<br>')+'</span>':'<span style="color:#FF6B6B">无输出，检查代码~</span>';
+}
+function checkChoice(el,correct,q){
+  if(window['q'+q+'_done'])return;
+  if(el.textContent.startsWith(correct)){el.classList.add('correct');window['q'+q+'_done']=true;el.innerHTML+=' 正确!';}
+  else{el.classList.add('wrong');el.innerHTML+=' 再想想';}
+  el.parentElement.querySelectorAll('.quiz-option').forEach(o=>o.style.pointerEvents='none');
+}
+function showHint(){let p=document.getElementById('outputPanel');if(p)p.innerHTML='<span style="color:#FFD700">提示：检查 cout/cin 语法，分号不要漏！</span>';}
+</script>
+
+</body>
+</html>
