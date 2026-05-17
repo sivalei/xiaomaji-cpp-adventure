@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 9：数组（列表处理） - 小蛋仔C++冒险岛</title>
+    
+    <!-- CodeMirror 5 CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffb6c1 0%, #d8bfd8 50%, #dda0dd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff69b4, #da70d6);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 25px;
+            background: #f9f0ff;
+            border-radius: 15px;
+            border-left: 5px solid #da70d6;
+        }
+        
+        .section h2 {
+            color: #ff69b4;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h2::before {
+            content: "🎒";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        
+        .story-box {
+            background: linear-gradient(135deg, #fff0f5, #f0e6ff);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px dashed #da70d6;
+        }
+        
+        .math-thinking {
+            background: #e6e6fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #9370db;
+        }
+        
+        .math-thinking h3 {
+            color: #8a2be2;
+            margin-bottom: 10px;
+        }
+        
+        .code-editor {
+            border: 3px solid #da70d6;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .code-header {
+            background: #da70d6;
+            color: white;
+            padding: 10px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff69b4, #da70d6);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+        
+        .btn-run {
+            background: linear-gradient(45deg, #32cd32, #228b22);
+        }
+        
+        .btn-hint {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+        }
+        
+        .output-box {
+            background: #1e1e1e;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            min-height: 100px;
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+        
+        .quiz-box {
+            background: #fff8dc;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #daa520;
+        }
+        
+        .quiz-question {
+            font-weight: bold;
+            color: #8b4513;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .quiz-option {
+            padding: 12px;
+            background: white;
+            border: 2px solid #daa520;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quiz-option:hover {
+            background: #fffacd;
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.correct {
+            background: #90ee90;
+            border-color: #228b22;
+        }
+        
+        .quiz-option.wrong {
+            background: #ffb6c1;
+            border-color: #dc143c;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 5px;
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.4);
+        }
+        
+        .points {
+            font-size: 1.2em;
+            color: #ff69b4;
+            font-weight: bold;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(45deg, #dda0dd, #da70d6);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .character {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #ff69b4, #da70d6);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .array-visual {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+        
+        .array-cell {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff69b4, #da70d6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .array-index {
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 Day 9：数组（列表处理） 🌟</h1>
+            <p>小蛋仔的背包：存放很多道具！</p>
+        </div>
+        
+        <div class="section">
+            <h2>📖 故事导入</h2>
+            <div class="story-box">
+                <p>小蛋仔要去冒险了！他需要准备很多道具：💎宝石、🍎苹果、🗡️剑、🛡️盾牌、🧪药水...</p>
+                <p>但是如果每个道具都用不同的变量名，那就太麻烦了！</p>
+                <p>这时候，<strong>数组</strong>就像小蛋仔的背包，可以一次性存放很多东西！</p>
+                <p>而且每个道具都有<strong>编号（索引）</strong>，方便快速找到！</p>
+                <div style="text-align: center; margin-top: 15px;">
+                    <div class="character">🥚</div>
+                    <p><em>小蛋仔：原来数组就像我的背包一样！</em></p>
+                </div>
+                
+                <div class="array-visual">
+                    <div>
+                        <div class="array-cell">10</div>
+                        <div class="array-index">索引 0</div>
+                    </div>
+                    <div>
+                        <div class="array-cell">20</div>
+                        <div class="array-index">索引 1</div>
+                    </div>
+                    <div>
+                        <div class="array-cell">30</div>
+                        <div class="array-index">索引 2</div>
+                    </div>
+                    <div>
+                        <div class="array-cell">40</div>
+                        <div class="array-index">索引 3</div>
+                    </div>
+                    <div>
+                        <div class="array-cell">50</div>
+                        <div class="array-index">索引 4</div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 10px;">↑ 这就是数组！每个格子都有编号（索引）</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🧠 数学思维：序列与索引</h2>
+            <div class="math-thinking">
+                <h3>数列的概念</h3>
+                <p>在数学里，我们学习过<strong>数列</strong>：a₁, a₂, a₃, ... , aₙ</p>
+                <p>每一个数都有它的位置（下标），比如：</p>
+                <p><strong>数列</strong>：2, 4, 6, 8, 10</p>
+                <ul>
+                    <li>a₁ = 2（第1项）</li>
+                    <li>a₂ = 4（第2项）</li>
+                    <li>a₃ = 6（第3项）</li>
+                </ul>
+                <p>在 C++ 中，<strong>数组</strong>就是这样的序列！但是注意：</p>
+                <p>💡 <strong>C++ 数组的索引从 0 开始！</strong></p>
+                <p>数组：arr[0]=2, arr[1]=4, arr[2]=6, arr[3]=8, arr[4]=10</p>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>💻 C++ 概念讲解：数组</h2>
+            <p><strong>数组</strong>是一种可以存储多个相同类型数据的容器。</p>
+            
+            <h3>数组的定义</h3>
+            <pre style="background: #f0f0f0; padding: 15px; border-radius: 8px; overflow-x: auto;">
+// 定义一个有 5 个整数的数组
+int coins[5] = {10, 20, 30, 40, 50};
+
+// 访问数组元素（使用索引）
+cout << coins[0] << endl;  // 输出：10
+cout << coins[2] << endl;  // 输出：30
+
+// 修改数组元素
+coins[1] = 25;  // 把第2个元素改成 25</pre>
+            
+            <h3>遍历数组</h3>
+            <pre style="background: #f0f0f0; padding: 15px; border-radius: 8px; overflow-x: auto;">
+// 使用 for 循环遍历数组
+for (int i = 0; i < 5; i++) {
+    cout << "coins[" << i << "] = " << coins[i] << endl;
+}</pre>
+            
+            <h3>关键概念</h3>
+            <ul style="line-height: 2;">
+                <li><strong>定义</strong>：数据类型 数组名[大小]</li>
+                <li><strong>索引</strong>：从 0 开始，到 大小-1 结束</li>
+                <li><strong>访问</strong>：数组名[索引]</li>
+                <li><strong>遍历</strong>：使用 for 循环</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 动手编码任务</h2>
+            
+            <h3>任务 1：定义数组存储5个金币数量，求和</h3>
+            <div class="code-editor">
+                <div class="code-header">
+                    <span>📝 任务 1：金币总和</span>
+                    <div>
+                        <button class="btn btn-hint" onclick="showHint(1)">💡 提示</button>
+                        <button class="btn btn-run" onclick="runCode(1)">▶️ 运行</button>
+                    </div>
+                </div>
+                <textarea id="code1" style="display:none;">#include <iostream>
+using namespace std;
+
+int main() {
+    // 定义数组存储5个金币数量
+    int coins[5] = {10, 20, 30, 40, 50};
+    
+    // 计算金币总和
+    int sum = 0;
+    
+    // 使用 for 循环遍历数组
+    
+    
+    cout << "金币总和：" << sum << endl;
+    return 0;
+}</textarea>
+                <div id="editor1"></div>
+            </div>
+            <div id="output1" class="output-box">运行结果将显示在这里...</div>
+            
+            <h3>任务 2：找出数组中的最大值</h3>
+            <div class="code-editor">
+                <div class="code-header">
+                    <span>📝 任务 2：找最大值</span>
+                    <div>
+                        <button class="btn btn-hint" onclick="showHint(2)">💡 提示</button>
+                        <button class="btn btn-run" onclick="runCode(2)">▶️ 运行</button>
+                    </div>
+                </div>
+                <textarea id="code2" style="display:none;">#include <iostream>
+using namespace std;
+
+int main() {
+    int numbers[5] = {23, 45, 12, 67, 34};
+    
+    // 找出数组中的最大值
+    int maxNum = numbers[0];  // 先假设第一个是最大值
+    
+    // 使用 for 循环比较
+    
+    
+    cout << "最大值：" << maxNum << endl;
+    return 0;
+}</textarea>
+                <div id="editor2"></div>
+            </div>
+            <div id="output2" class="output-box">运行结果将显示在这里...</div>
+            
+            <h3>任务 3：自由创作 - 存储7天的温度，计算平均温度</h3>
+            <div class="code-editor">
+                <div class="code-header">
+                    <span>📝 任务 3：平均温度</span>
+                    <div>
+                        <button class="btn btn-hint" onclick="showHint(3)">💡 提示</button>
+                        <button class="btn btn-run" onclick="runCode(3)">▶️ 运行</button>
+                    </div>
+                </div>
+                <textarea id="code3" style="display:none;">#include <iostream>
+using namespace std;
+
+int main() {
+    // 定义数组存储7天的温度
+    double temperatures[7] = {25.5, 26.0, 24.5, 27.0, 23.5, 26.5, 25.0};
+    
+    // 计算平均温度
+    double sum = 0.0;
+    
+    
+    double average = sum / 7;
+    
+    cout << "7天的温度：";
+    for (int i = 0; i < 7; i++) {
+        cout << temperatures[i] << " ";
+    }
+    cout << endl;
+    cout << "平均温度：" << average << " °C" << endl;
+    return 0;
+}</textarea>
+                <div id="editor3"></div>
+            </div>
+            <div id="output3" class="output-box">运行结果将显示在这里...</div>
+        </div>
+        
+        <div class="section">
+            <h2>📝 小测验</h2>
+            <div class="quiz-box">
+                <div class="quiz-question">1. 在 C++ 中，数组的索引是从几开始的？</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">A. 1</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">B. 0</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">C. -1</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">D. 随便</div>
+                </div>
+            </div>
+            
+            <div class="quiz-box">
+                <div class="quiz-question">2. 定义 `int arr[5] = {10, 20, 30, 40, 50};`，那么 `arr[2]` 的值是多少？</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">A. 10</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">B. 20</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">C. 30</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">D. 40</div>
+                </div>
+            </div>
+            
+            <div class="quiz-box">
+                <div class="quiz-question">3. 下面哪个是正确的数组遍历方式？</div>
+                <div class="quiz-options">
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">A. for(i=1; i<=5; i++)</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, true)">B. for(i=0; i<5; i++)</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">C. for(i=0; i<=5; i++)</div>
+                    <div class="quiz-option" onclick="checkAnswer(this, false)">D. for(i=1; i<5; i++)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🌟 今日总结</h2>
+            <div style="background: #e6e6fa; padding: 20px; border-radius: 10px;">
+                <h3>今天我们学会了：</h3>
+                <ul style="line-height: 2;">
+                    <li>✅ <strong>数学思维</strong>：序列与索引（数列的第n项）</li>
+                    <li>✅ <strong>数组定义</strong>：如何定义和初始化数组</li>
+                    <li>✅ <strong>数组访问</strong>：使用索引访问数组元素</li>
+                    <li>✅ <strong>数组遍历</strong>：使用 for 循环遍历数组</li>
+                    <li>✅ <strong>实际应用</strong>：求和、找最大值、计算平均值</li>
+                </ul>
+                
+                <h3>重要概念：</h3>
+                <pre style="background: #fff; padding: 15px; border-radius: 8px; margin-top: 10px;">
+// 数组的基本操作
+int arr[5] = {10, 20, 30, 40, 50};  // 定义并初始化
+cout << arr[0];  // 访问：索引从 0 开始
+arr[1] = 25;     // 修改
+
+// 遍历数组
+for (int i = 0; i < 5; i++) {
+    cout << arr[i] << endl;
+}</pre>
+                
+                <p style="margin-top: 15px;">🎉 <strong>恭喜你！</strong>你已经掌握了数组的概念！数组是存储和处理大量数据的重要工具。</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <h3>🎉 恭喜完成 Day 9！</h3>
+            <p>你获得了 <span class="badge">🎒 数组大师徽章</span></p>
+            <p class="points">积分：+100 分</p>
+            <p>明天我们将学习：<strong>字符串处理</strong></p>
+            <button class="btn" onclick="goToNextDay()" style="margin-top: 15px;">➡️ 前往 Day 10</button>
+        </div>
+    </div>
+    
+    <script>
+        // 初始化 CodeMirror 编辑器
+        let editors = [];
+        
+        // 初始化所有编辑器
+        for (let i = 1; i <= 3; i++) {
+            let textarea = document.getElementById('code' + i);
+            let editor = CodeMirror(document.getElementById('editor' + i), {
+                value: textarea.value,
+                mode: 'text/x-c++src',
+                theme: 'monokai',
+                lineNumbers: true,
+                indentUnit: 4,
+                indentWithTabs: false,
+                lineWrapping: true,
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"}
+            });
+            editors[i] = editor;
+        }
+        
+        // C++ 模拟器（简化版）
+        function runCPPCode(code, taskNum) {
+            let output = "";
+            
+            try {
+                // 任务1：金币总和
+                if (taskNum === 1) {
+                    if (code.includes('for') && code.includes('sum')) {
+                        output += "金币总和：150\n";
+                        output += "✅ 太棒了！你正确计算了金币总和！\n";
+                    } else {
+                        output += "💡 提示：使用 for 循环遍历数组，把每个元素加到 sum 上\n";
+                    }
+                }
+                
+                // 任务2：找最大值
+                if (taskNum === 2) {
+                    if (code.includes('for') && code.includes('maxNum')) {
+                        output += "最大值：67\n";
+                        output += "✅ 太棒了！你正确找到了最大值！\n";
+                    } else {
+                        output += "💡 提示：使用 for 循环比较每个数和 maxNum\n";
+                    }
+                }
+                
+                // 任务3：平均温度
+                if (taskNum === 3) {
+                    if (code.includes('for') && code.includes('sum')) {
+                        output += "7天的温度：25.5 26 24.5 27 23.5 26.5 25\n";
+                        output += "平均温度：25.3571 °C\n";
+                        output += "✅ 太棒了！你正确计算了平均温度！\n";
+                    } else {
+                        output += "💡 提示：使用 for 循环求和，然后除以 7\n";
+                    }
+                }
+                
+                if (output === "") {
+                    output = "💡 代码已运行，但没有输出。\n💡 提示：完成 for 循环来计算结果。";
+                }
+                
+            } catch (e) {
+                output = "❌ 运行错误：\n" + e.message;
+            }
+            
+            return output;
+        }
+        
+        // 运行代码
+        function runCode(taskNum) {
+            let code = editors[taskNum].getValue();
+            let output = runCPPCode(code, taskNum);
+            
+            let outputDiv = document.getElementById('output' + taskNum);
+            outputDiv.textContent = output;
+            outputDiv.style.color = '#ffffff';
+            
+            // 完成任务，增加积分
+            if (!output.includes("💡 提示")) {
+                addPoints(30);
+            }
+        }
+        
+        // 显示提示
+        function showHint(taskNum) {
+            let hints = {
+                1: "💡 提示：\n1. 使用 for 循环从 i=0 到 i<5\n2. 在循环里：sum = sum + coins[i]\n3. 最后输出 sum",
+                2: "💡 提示：\n1. 使用 for 循环从 i=1 开始（因为 maxNum 已经是 numbers[0]）\n2. 如果 numbers[i] > maxNum，就更新 maxNum\n3. 最后输出 maxNum",
+                3: "💡 提示：\n1. 使用 for 循环从 i=0 到 i<7\n2. 在循环里：sum = sum + temperatures[i]\n3. 循环结束后计算 average = sum / 7"
+            };
+            
+            alert(hints[taskNum]);
+        }
+        
+        // 检查测验答案
+        function checkAnswer(element, isCorrect) {
+            let options = element.parentElement.children;
+            for (let opt of options) {
+                opt.classList.remove('correct', 'wrong');
+            }
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                alert("✅ 答对了！太棒了！");
+                addPoints(10);
+            } else {
+                element.classList.add('wrong');
+                alert("❌ 再想想哦！");
+            }
+        }
+        
+        // 积分系统
+        let points = parseInt(localStorage.getItem('day9_points') || '0');
+        
+        function addPoints(p) {
+            points += p;
+            localStorage.setItem('day9_points', points);
+            updatePointsDisplay();
+        }
+        
+        function updatePointsDisplay() {
+            let pointsElements = document.querySelectorAll('.points');
+            pointsElements.forEach(el => {
+                if (el.textContent.includes('积分')) {
+                    el.textContent = `积分：${points} 分`;
+                }
+            });
+        }
+        
+        window.onload = function() {
+            updatePointsDisplay();
+        };
+        
+        function goToNextDay() {
+            alert("🎉 恭喜完成 Day 9！\n积分已保存：" + points + " 分");
+        }
+    </script>
+</body>
+</html>
