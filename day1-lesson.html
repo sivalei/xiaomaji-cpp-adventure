@@ -1040,7 +1040,10 @@ function escHtml(s){var d=document.createElement('div');d.textContent=s;return d
     <a href="day2-lesson.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;font-size:14px;font-weight:700;text-decoration:none;color:#FFF;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;transition:all .2s">Day 2 →</a>
   </div>
   <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
-    <button onclick="openScoreboard()" style="background:linear-gradient(135deg,var(--yellow),#FFC107);color:#333;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">📊 Total Score</button>
+    <button onclick="openScoreboard()" style="background:linear-gradient(135deg,var(--yellow),#FFC107);color:#333;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">📊 Score Board</button>
+    <button onclick="saveToCloud()" style="background:linear-gradient(135deg,var(--mintLime, #00D4AA),#00B894);color:#FFF;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">☁️ Sync to Cloud</button>
+    <button onclick="loadFromCloud()" style="background:linear-gradient(135deg,var(--blue),#4A90D9);color:#FFF;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">⬇️ Load from Cloud</button>
+    <button onclick="exportScoresCSV()" style="background:linear-gradient(135deg,var(--yellow),#FFC107);color:#333;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">📊 Total Score</button>
     <button onclick="exportScoresCSV()" style="background:#FFF;border:2px solid #E0D5F0;padding:8px 20px;border-radius:20px;cursor:pointer;font-size:14px;color:#666;font-family:inherit">💾 Save Score</button>
   </div>
 </div>
@@ -1105,6 +1108,83 @@ function escHtml(s){var d=document.createElement('div');d.textContent=s;return d
   };
   
   document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('sbOverlay').style.display='none';});
+})();
+</script>
+
+
+<script>
+// ====== Cloud Sync: User provides own GitHub Token ======
+(function(){
+  if(window._cloudInited)return; window._cloudInited=true;
+  
+  var API = 'https://api.github.com/repos/sivalei/xiaomaji-cpp-adventure/contents/scores.json';
+  
+  function getToken(){
+    var t = localStorage.getItem('gh_token')||'';
+    if(!t){
+      t = prompt('\u8BF7\u8F93\u5165\u4F60\u7684 GitHub Personal Access Token\n(GitHub Settings > Developer settings > PATs)\n\u6743\u9650\u9700\u8981: repo)\n\nToken \u4FDD\u5B58\u5728\u6D4F\u89C9\u5668\u672C\u5730\uFF0C\u4E0D\u4F1A\u4E0A\u4F20\u670D\u52A1\u5668:');
+      if(t) localStorage.setItem('gh_token', t.trim());
+    }
+    return t;
+  }
+  
+  window.saveToCloud = function(name){
+    name = name || prompt('\u7528\u6237\u540D:', localStorage.getItem('egg_cloud_name')||'');
+    if(!name) return;
+    var token = getToken();
+    if(!token){alert('\u9700\u8981 Token \u624D\u80FD\u4FDD\u5B58\u5230\u4E91\u7AEF');return;}
+    localStorage.setItem('egg_cloud_name', name);
+    
+    // Collect scores
+    var scores = {};
+    for(var i=1;i<=14;i++){
+      scores['d'+i] = parseInt(localStorage.getItem('egg_score_d'+i)||'0');
+      scores['done'+i] = !!localStorage.getItem('egg_score_done_d'+i);
+    }
+    scores.updated = new Date().toISOString();
+    
+    // Fetch current scores.json
+    fetch(API, {headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(!r.ok)throw new Error('Fetch failed: '+r.status);return r.json()})
+    .then(function(data){
+      var content = JSON.parse(atob(data.content));
+      if(!content.users) content.users = {};
+      content.users[name] = {name:name, scores:scores, updated:new Date().toISOString()};
+      content.last_updated = new Date().toISOString();
+      
+      return fetch(API, {
+        method:'PUT',
+        headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+        body: JSON.stringify({message:'Update '+name,content:btoa(unescape(encodeURIComponent(JSON.stringify(content,null,2)))),sha:data.sha,branch:'main'})
+      });
+    })
+    .then(function(r){if(!r.ok)throw new Error('Save failed: '+r.status);return r.json()})
+    .then(function(){alert('\u2705 \u4FDD\u5B58\u6210\u529F\uFF01\u7528\u6237: '+name)})
+    .catch(function(e){alert('\u274C \u4FDD\u5B58\u5931\u8D25: '+e.message)});
+  };
+  
+  window.loadFromCloud = function(name){
+    name = name || prompt('\u7528\u6237\u540D:', localStorage.getItem('egg_cloud_name')||'');
+    if(!name) return;
+    var token = getToken();
+    if(!token){alert('\u9700\u8981 Token \u624D\u80FD\u4ECE\u4E91\u7AEF\u52A0\u8F7D');return;}
+    
+    fetch(API, {headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(!r.ok)throw new Error('Fetch failed');return r.json()})
+    .then(function(data){
+      var content = JSON.parse(atob(data.content));
+      if(!content.users||!content.users[name]){alert('\u672A\u627E\u5230\u7528\u6237: '+name);return;}
+      var sc = content.users[name].scores;
+      for(var i=1;i<=14;i++){
+        if(sc['d'+i])localStorage.setItem('egg_score_d'+i, String(sc['d'+i]));
+        if(sc['done'+i])localStorage.setItem('egg_score_done_d'+i,'1');
+      }
+      localStorage.setItem('egg_cloud_name', name);
+      alert('\u2705 \u52A0\u8F7D\u6210\u529F\uFF01\u7528\u6237: '+name+'\n\u9875\u9762\u5C06\u5237\u65B0...');
+      setTimeout(function(){location.reload()},500);
+    })
+    .catch(function(e){alert('\u274C \u52A0\u8F7D\u5931\u8D25: '+e.message)});
+  };
 })();
 </script>
 
