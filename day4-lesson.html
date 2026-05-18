@@ -1,168 +1,792 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title> Day 4 - 运算符与数学计算</title>
+
+<title>🧮 Day 4 - Operators | 小蛋仔C++冒险岛</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+
 <style>
-:root{--pink:#FF6B9D;--purple:#C44AFF;--yellow:#FFD700;--mint:#00D4AA;--blue:#5B9BD5;--orange:#FF8C42;--bg:#FFF5F9;--cardBg:#FFF;--text:#333;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:20px}
+
+:root{--pink:#FF6B9D;--purple:#C44AFF;--yellow:#FFD700;--orange:#FF8C42;--mint:#00D4AA;--blue:#5B9BD5;--bg:#FFF5F9;--cardBg:#FFF;--text:#333;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:20px}
+
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;font-size:18px;background:var(--bg);color:var(--text);line-height:1.7}
+
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;font-size:18px;background:var(--bg);color:var(--text);line-height:1.7;background-image:radial-gradient(circle at 10% 20%,rgba(255,107,157,.06) 0%,transparent 50%),radial-gradient(circle at 90% 70%,rgba(196,74,255,.05) 0%,transparent 50%)}
+
+h2{font-size:28px;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+
+h3{font-size:22px;margin-bottom:12px}
+
 .container{max-width:1100px;margin:0 auto;padding:20px}
+
 .header{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;padding:16px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 2px 12px rgba(255,107,157,.3);border-radius:0 0 var(--radius) var(--radius)}
+
 .logo{font-size:26px;font-weight:700;display:flex;align-items:center;gap:8px}
+
 .header-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+
+.badge-display{display:flex;align-items:center;gap:6px;font-size:14px;background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px}
+
 .points-display{font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px}
+
 .progress-bar-wrap{background:rgba(255,255,255,.3);border-radius:10px;height:10px;width:150px}
+
 .progress-bar{background:var(--yellow);height:100%;border-radius:10px;transition:width .5s}
+
 .day-badge{background:var(--yellow);color:#333;padding:4px 14px;border-radius:20px;font-weight:700;font-size:15px}
+
 .step-nav{display:flex;gap:6px;justify-content:center;padding:20px 0;flex-wrap:wrap}
+
 .step-btn{padding:10px 20px;border-radius:25px;border:2px solid #E0D5F0;background:#FFF;cursor:pointer;font-size:16px;font-weight:600;transition:all .3s;color:#999;font-family:inherit}
+
 .step-btn.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;border-color:transparent;transform:scale(1.05)}
-.section{display:none;animation:fadeIn .5s ease}.section.active{display:block}
+
+.step-btn.done{background:var(--mint);color:#FFF;border-color:transparent}
+
+.section{display:none;animation:fadeIn .5s ease}
+
+.section.active{display:block}
+
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
 .card{background:var(--cardBg);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow);margin-bottom:20px;border:2px solid #F0E6F6}
+
+.card:hover{box-shadow:0 6px 30px rgba(0,0,0,.12)}
+
+.story-card{border-left:5px solid var(--pink)}
+
+.concept-card{border-left:5px solid var(--purple)}
+
+.code-card{border-left:5px solid var(--blue)}
+
+.quiz-card{border-left:5px solid var(--orange)}
+
+.summary-card{border-left:5px solid var(--mint)}
+
 .story-step{cursor:pointer;padding:16px 20px;margin:8px 0;border-radius:12px;background:#FFF0F5;border:2px dashed var(--pink);transition:all .3s;display:flex;align-items:flex-start;gap:14px}
+
 .story-step:hover{transform:translateX(5px);background:#FFE4EE}
+
+.story-step .step-num{font-size:28px;min-width:40px;text-align:center}
+
 .story-step.revealed{background:#FFE4EE;border-style:solid;border-color:var(--pink)}
-.code-block{background:#2D2D3F;color:#F8F8F2;padding:20px;border-radius:12px;font-size:15px;overflow-x:auto;line-height:1.8;margin:10px 0;font-family:"Fira Code",Consolas,monospace}
-.quiz-question{padding:18px;margin:10px 0;background:#FFF9F0;border-radius:12px;border:2px solid #FFE4CC}
-.quiz-option{padding:12px 16px;margin:6px 0;border-radius:10px;border:2px solid #E0D5F0;cursor:pointer;transition:all .2s;font-size:16px}
-.quiz-option:hover{border-color:var(--orange);background:#FFF5EE}
-.quiz-option.correct{background:#D4EDDA;border-color:#28A745!important}
-.quiz-option.wrong{background:#F8D7DA;border-color:#DC3545!important}
-.quiz-input{padding:10px 16px;border:2px solid #E0D5F0;border-radius:10px;font-size:16px;width:120px;text-align:center;font-family:monospace}
+
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+
+.tab-btn{padding:10px 22px;border-radius:25px;border:2px solid #E0D5F0;background:#FFF;cursor:pointer;font-size:17px;font-weight:600;transition:all .3s;font-family:inherit}
+
+.tab-btn.active{background:linear-gradient(135deg,var(--purple),#A855F7);color:#FFF;border-color:transparent}
+
+.tab-content{display:none;animation:fadeIn .3s}
+
+.tab-content.active{display:block}
+
+.code-block{background:#2D2D3F;color:#F8F8F2;padding:20px;border-radius:12px;font-size:15px;overflow-x:auto;line-height:1.8;margin:10px 0}
+
+.code-block code{color:#F8F8F2}
+
+.code-compare-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:16px}
+
+.code-compare-table th{background:var(--purple);color:#FFF;padding:10px 14px;text-align:left}
+
+.code-compare-table td{padding:10px 14px;border-bottom:1px solid #E0D5F0}
+
+.code-compare-table tr:hover{background:#F5EEFF}
+
+.editor-layout{display:flex;gap:20px;flex-wrap:wrap}
+
+.task-panel{flex:0 0 320px;background:#FAF0FF;border-radius:12px;padding:20px}
+
+.task-panel h4{font-size:18px;margin-bottom:10px;color:var(--purple)}
+
+.task-item{display:none}
+
+.task-item.active{display:block}
+
+.task-item p{margin:6px 0;font-size:16px}
+
+.task-item .hint{color:#999;font-size:14px;margin-top:8px;font-style:italic}
+
+.editor-panel{flex:1;min-width:400px;border:2px solid #E0D5F0;border-radius:12px;overflow:hidden}
+
+.CodeMirror{height:260px!important;font-size:16px!important;font-family:"Fira Code","Consolas",monospace!important}
+
+.output-panel{background:#1E1E2E;color:#00FF88;padding:14px 18px;font-size:16px;font-family:"Fira Code","Consolas",monospace;min-height:60px;max-height:150px;overflow-y:auto;border-top:2px solid #333}
+
+.btn-row{display:flex;gap:10px;margin:14px 0;flex-wrap:wrap}
+
 .btn{padding:10px 28px;border-radius:25px;border:none;cursor:pointer;font-size:17px;font-weight:600;transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+
+.btn:hover{transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,.15)}
+
+.btn:active{transform:translateY(0)}
+
 .btn-run{background:linear-gradient(135deg,var(--mint),#00B894);color:#FFF}
+
 .btn-hint{background:#FFF;border:2px solid var(--yellow);color:#B8860B}
-.btn-next{background:linear-gradient(135deg,var(--blue),#4A90D9);color:#FFF}
-.output-panel{background:#1E1E2E;color:#00FF88;padding:14px 18px;font-size:16px;font-family:"Fira Code",monospace;min-height:60px;max-height:150px;overflow-y:auto;border-top:2px solid #333}
-@media(max-width:768px){.header{flex-direction:column;text-align:center}.step-nav{flex-direction:column;align-items:center}}
+
+.btn-task{background:#FFF;border:2px solid #E0D5F0;color:#666;margin:4px}
+
+.btn-task.active{background:var(--purple);color:#FFF;border-color:transparent}
+
+.btn-prev,.btn-next{background:linear-gradient(135deg,var(--blue),#4A90D9);color:#FFF}
+
+.quiz-question{padding:18px;margin:10px 0;background:#FFF9F0;border-radius:12px;border:2px solid #FFE4CC}
+
+.quiz-question .q-title{font-weight:700;font-size:18px;margin-bottom:10px}
+
+.quiz-option{padding:12px 16px;margin:6px 0;border-radius:10px;border:2px solid #E0D5F0;cursor:pointer;transition:all .2s;font-size:16px}
+
+.quiz-option:hover{border-color:var(--orange);background:#FFF5EE}
+
+.quiz-option.correct{background:#D4EDDA;border-color:#28A745!important;animation:pulse .3s}
+
+.quiz-option.wrong{background:#F8D7DA;border-color:#DC3545!important}
+
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+.quiz-input{padding:10px 16px;border:2px solid #E0D5F0;border-radius:10px;font-size:16px;width:120px;text-align:center;font-family:"Fira Code",monospace}
+
+.result-banner{text-align:center;padding:16px;margin:12px 0;border-radius:12px;font-size:20px;font-weight:700}
+
+.result-banner.great{background:#D4EDDA;color:#155724}
+
+.result-banner.good{background:#FFF3CD;color:#856404}
+
+.knowledge-card{background:linear-gradient(135deg,#FFF,#FFF5F9);padding:24px;border-radius:12px;border:3px solid var(--pink);text-align:center;max-width:320px;margin:0 auto}
+
+.achievement{display:flex;align-items:center;gap:16px;justify-content:center;padding:20px;margin:10px 0;font-size:22px;font-weight:700}
+
+.badge-icon{font-size:50px;animation:bounceIn .6s}
+
+@keyframes bounceIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+.tomorrow-preview{background:linear-gradient(135deg,#F0E6F6,#FFF0F5);padding:20px;border-radius:12px;text-align:center}
+
+@media(max-width:768px){.editor-layout{flex-direction:column}.task-panel{flex:auto}.header{flex-direction:column;text-align:center}h2{font-size:24px}}
+
 </style>
+
 </head>
+
 <body>
+
 <div class="header">
-  <div class="logo"><span style="font-size:36px">🥚</span>小蛋仔C++冒险岛</div>
-  <div class="header-right">
-    <div class="day-badge">📅 Day 4 / 14</div>
-    <div class="progress-bar-wrap"><div class="progress-bar" style="width:28.571428571428573%"></div></div>
-    <div class="points-display">💰 <span id="pointsDisplay">0</span>分</div>
-  </div>
+
+<div class="logo"><span style="font-size:36px">🥚</span>小蛋仔C++冒险岛</div>
+
+<div class="header-right">
+
+<div class="day-badge">📅 Day 1 / 240</div>
+
+<div class="progress-bar-wrap"><div class="progress-bar" id="dayProgress" style="width:0.4%"></div></div>
+
+<div class="points-display"><span>💰</span><span id="pointsDisplay">0</span>分</div>
+
+<div class="badge-display" id="badgeDisplay"><span>🎖️</span>还没有徽章</div>
+
 </div>
+
+</div>
+
 <div class="container">
-  <div class="step-nav">
-    <button class="step-btn active" onclick="showSection(0)">🎬 故事</button>
-    <button class="step-btn" onclick="showSection(1)">📖 概念</button>
-    <button class="step-btn" onclick="showSection(2)">⌨️ 编码</button>
-    <button class="step-btn" onclick="showSection(3)">✅ 测验</button>
-  </div>
 
-  <!-- 故事 -->
-  <div class="section active" id="section0">
-    <div class="card" style="border-left:5px solid var(--pink)">
-      <h2>🎬 故事导入</h2>
-      <div style="padding:10px">小蛋仔来到了「代码王国的数学塔」！塔里的每一个符号（+ - * /）都是一把钥匙，组合起来可以打开任何宝箱！<br><br>就像做数学题一样，C++ 也能做计算！</div>
-      <div style="text-align:center;margin-top:20px"><button class="btn btn-next" onclick="showSection(1)">📖 学习概念 →</button></div>
-    </div>
-  </div>
+<div class="step-nav">
 
-  <!-- 概念 -->
-  <div class="section" id="section1">
-    <div class="card" style="border-left:5px solid var(--purple)">
-      <h2>📖 概念讲解</h2>
-      <div style="padding:10px"><div class="code-block"><code>int a=10, b=3;<br>cout << a+b;  // 13<br>cout << a-b;  // 7<br>cout << a*b;  // 30<br>cout << a/b;  // 3（整数除法！）<br>cout << a%b;  // 1（余数）</code></div><p style="margin-top:10px">💡 整数除法会舍去小数！3/2 得 1，不是 1.5！</p></div>
-      <div style="text-align:center;margin-top:20px">
-        <button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="showSection(0)">← 🎬 回看</button>
-        <button class="btn btn-next" onclick="showSection(2)">⌨️ 动手编码 →</button>
-      </div>
-    </div>
-  </div>
+<button class="step-btn active" onclick="showSection(0)">🎬 故事导入</button>
 
-  <!-- 编码 -->
-  <div class="section" id="section2">
-    <div class="card" style="border-left:5px solid var(--blue)">
-      <h2>⌨️ 动手编码</h2>
-      <div style="padding:10px">
-        <textarea id="codeEditor" style="width:100%;height:200px;background:#282a36;color:#f8f8f2;font-family:monospace;font-size:15px;padding:10px;border-radius:8px;border:none">#include <iostream>
+<button class="step-btn" onclick="showSection(1)">📖 概念讲解</button>
+
+<button class="step-btn" onclick="showSection(2)">⌨️ 动手编码</button>
+
+<button class="step-btn" onclick="showSection(3)">✅ 小测验</button>
+
+<button class="step-btn" onclick="showSection(4)">🌟 今日总结</button>
+
+</div>
+
+
+
+<div class="section active" <div class="card story-card">
+<h2>🎬 故事导入：数学神殿的考验</h2>
+<p style="color:#888;margin-bottom:14px">点击每一段展开故事</p>
+
+<div class="story-step" onclick="revealStory(this)">
+<div class="step-num">1️⃣</div>
+<div><p>小蛋仔来到<span style="color:var(--orange)"><strong>数学神殿</strong></span>！一只智慧猫NPC告诉它：</p>
+<p style="color:var(--orange)">"想打开宝箱吗？那你得学会计算魔法！"</p></div>
+</div>
+
+<div class="story-step" onclick="revealStory(this)">
+<div class="step-num">2️⃣</div>
+<div><p>猫NPC在黑板上写了C++的五种<span style="color:var(--purple)"><strong>运算符</strong></span>：</p>
+<div style="background:#FFF0F5;padding:14px;border-radius:10px;margin:8px 0">
+<code>+</code> 加法 | <code>-</code> 减法 | <code>*</code> 乘法<br>
+<code>/</code> 除法 | <code>%</code> 取余数</div>
+<p>注意！<code>*</code> 不是 ×，<code>/</code> 不是 ÷ 哦！</p></div>
+</div>
+
+<div class="story-step" onclick="revealStory(this)">
+<div class="step-num">3️⃣</div>
+<div><p style="color:var(--mint)"><strong>蛋仔任务：</strong></p>
+<p>小蛋仔要用代码计算：打开宝箱需要 <code>10 + 3 * 2</code> 个金币！</p>
+<p style="color:var(--pink);font-weight:700">int coins = 10 + 3 * 2;  // 答案是 16！</p></div>
+</div>
+
+<div style="text-align:center;margin-top:20px">
+<button class="btn btn-next" onclick="showSection(1)">📖 开始学习概念 →</button>
+</div>
+</div>
+
+
+
+
+<div class="section" <div class="card concept-card">
+<h2>📖 概念讲解：五个运算符</h2>
+
+<div class="tabs">
+<button class="tab-btn active" onclick="switchTab(0)">📦 基础运算</button>
+<button class="tab-btn" onclick="switchTab(1)">🔍 注意事项</button>
+<button class="tab-btn" onclick="switchTab(2)">🎮 游戏联想</button>
+</div>
+
+<div class="tab-content active" id="tab0">
+<h3>🧮 C++的五种运算符</h3>
+<div class="code-block">
+<code>int a = 10, b = 3;<br>
+cout << a + b;  // 13<br>
+cout << a - b;  // 7<br>
+cout << a * b;  // 30<br>
+cout << a / b;  // 3  ← 注意是3不是3.5！<br>
+cout << a % b;  // 1  (10÷3=3余1)</code>
+</div>
+<p>和数学课学的<strong>几乎一样</strong>，只要记住 <code>*</code> 和 <code>/</code> 就行！</p>
+</div>
+
+<div class="tab-content" id="tab1">
+<h3>⚠️ 特别注意！</h3>
+<table class="code-compare-table">
+<tr><th>问题</th><th>说明</th><th>例子</th></tr>
+<tr><td><code>a / b</code> 整数除法</td><td>两个整数相除，<strong>丢弃小数</strong>！</td><td>10/3 = 3 不是 3.5</td></tr>
+<tr><td><code>%</code> 取余数</td><td>只用于<strong>整数</strong>，求余数</td><td>10%3 = 1</td></tr>
+<tr><td><code>* / %</code> 优先级</td><td>乘除取余 <strong>先于</strong> 加减</td><td>10+3*2 = 10+6 = 16</td></tr>
+</table>
+</div>
+
+<div class="tab-content" id="tab2">
+<h3>🎮 蛋仔派对 × 运算符</h3>
+<table class="code-compare-table">
+<tr><th>游戏场景</th><th>运算</th><th>C++代码</th></tr>
+<tr><td>捡到金币+10个</td><td>加法</td><td>coins = coins + 10</td></tr>
+<tr><td>掉进陷阱减5</td><td>减法</td><td>hp = hp - 5</td></tr>
+<tr><td>双倍金币buff</td><td>乘法</td><td>coins = coins * 2</td></tr>
+<tr><td>平分金币</td><td>除法(商)</td><td>each = coins / 3</td></tr>
+<tr><td>剩几个分不掉</td><td>取余</td><td>left = coins % 3</td></tr>
+</table>
+</div>
+</div>
+
+
+
+
+<div class="section" id="section2">
+
+<div class="card code-card">
+
+<h2>⌨️ 动手编码：小蛋仔的第一行魔法咒语</h2>
+
+<div class="editor-layout">
+
+<div class="task-panel">
+
+<h4>📋 任务列表</h4>
+
+<div style="margin-bottom:12px">
+
+<button class="btn btn-task active" onclick="switchTask(0)">1️⃣ 跟我敲</button>
+
+<button class="btn btn-task" onclick="switchTask(1)">2️⃣ 改名字</button>
+
+<button class="btn btn-task" onclick="switchTask(2)">3️⃣ 自由创作</button>
+
+</div>
+
+<div class="task-item active" id="taskItem0">
+
+<p>🎯 <strong>任务一：跟着敲一遍</strong></p>
+
+<p>在右边编辑器里输入以下代码，点击<strong>运行</strong>：</p>
+
+<div class="code-block"><code>#include &lt;iostream&gt;
+
+using namespace std;
+
+int main() {
+
+    cout &lt;&lt; "Hello World!";
+
+    return 0;
+
+}</code></div>
+
+<p class="hint">💡 cout 后面的箭头是 &lt;&lt;，分号 ; 不能忘哦~</p>
+
+</div>
+
+<div class="task-item" id="taskItem1">
+
+<p>🎯 <strong>任务二：变身蛋仔！</strong></p>
+
+<p>把 Hello World 改成你的蛋仔名字：</p>
+
+<div class="code-block"><code>cout &lt;&lt; "大家好！我是蛋仔小彩虹！" &lt;&lt; endl;
+
+cout &lt;&lt; "欢迎来我的代码世界！" &lt;&lt; endl;</code></div>
+
+<p class="hint">💡 endl 就是换行，像在聊天框里按回车！</p>
+
+</div>
+
+<div class="task-item" id="taskItem2">
+
+<p>🎯 <strong>任务三：自由创作</strong></p>
+
+<p>写程序介绍你和喜欢的游戏：</p>
+
+<div class="code-block"><code>cout &lt;&lt; "我是三年级的小蛋仔！" &lt;&lt; endl;
+
+cout &lt;&lt; "我喜欢蛋仔派对！" &lt;&lt; endl;
+
+cout &lt;&lt; "我也喜欢我的世界！" &lt;&lt; endl;</code></div>
+
+<p class="hint">💡 可以随便写你想说的话！</p>
+
+</div>
+
+</div>
+
+<div class="editor-panel">
+
+<textarea id="codeEditor">#include <iostream>
 using namespace std;
 int main() {
-    int a=10, b=3;
-    cout << "a+b=" << a+b << endl;
-    cout << "a/b=" << a/b << endl;
+    int a = 10, b = 3;
+    cout << "a + b = " << a + b << endl;
+    cout << "a - b = " << a - b << endl;
+    cout << "a * b = " << a * b << endl;
+    cout << "a / b = " << a / b << endl;
+    cout << "a % b = " << a % b << endl;
     return 0;
 }</textarea>
-        <div class="output-panel" id="outputPanel"><span style="color:#888">点击运行查看输出...</span></div>
-        <div style="padding:12px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-run" onclick="runCode()">🚀 运行代码</button>
-          <button class="btn btn-hint" onclick="showHint()">💡 提示</button>
-        </div>
-      </div>
-      <div style="text-align:center;margin-top:20px">
-        <button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="showSection(1)">← 📖 回看</button>
-        <button class="btn btn-next" onclick="showSection(3)">✅ 开始测验 →</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- 测验 -->
-  <div class="section" id="section3">
-    <div class="card" style="border-left:5px solid var(--orange)">
-      <h2>✅ 小测验</h2>
-      <div style="padding:10px"><div class="quiz-question"><div style="font-weight:700;margin-bottom:10px">1️⃣ 10/3 的结果是多少？</div><div class="quiz-option" onclick="checkChoice(this,'A',1)">A. 3</div><div class="quiz-option" onclick="checkChoice(this,'A',1)">B. 3.333</div><div class="quiz-option" onclick="checkChoice(this,'A',1)">C. 1</div></div></div>
-    </div>
+<div class="output-panel" id="outputPanel">
+
+<span style="color:#888">👇 点击"运行"按钮查看程序输出...</span>
+
+</div>
+
+<div style="padding:12px;display:flex;gap:10px;flex-wrap:wrap">
+
+<button class="btn btn-run" onclick="runCode()">🚀 运行代码</button>
+
+<button class="btn btn-hint" onclick="showHint()">💡 查看提示</button>
+
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="resetCode()">🔄 重置代码</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div style="text-align:center;margin-top:20px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+
+<button class="btn btn-prev" onclick="showSection(1)">← 📖 回看讲解</button>
+
+<button class="btn btn-next" onclick="showSection(3)">✅ 开始测验 →</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="section" <div class="card quiz-card">
+<h2>✅ 小测验：运算符</h2>
+
+<div class="quiz-question">
+<div class="q-title">1. C++里乘法用什么符号？</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',0)">A. ×</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',0)">B. *</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',0)">C. x</div>
+<p class="quiz-result" id="res0"></p>
+</div>
+
+<div class="quiz-question">
+<div class="q-title">2. 10 / 3 = ？ (整数除法)</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',1)">A. 3.5</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',1)">B. 3</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',1)">C. 4</div>
+<p class="quiz-result" id="res1"></p>
+</div>
+
+<div class="quiz-question">
+<div class="q-title">3. 10 % 3 = ？</div>
+<div class="quiz-option" onclick="checkChoice(this,'C',2)">A. 0</div>
+<div class="quiz-option" onclick="checkChoice(this,'C',2)">B. 2</div>
+<div class="quiz-option" onclick="checkChoice(this,'C',2)">C. 1</div>
+<p class="quiz-result" id="res2"></p>
+</div>
+
+<div class="quiz-question">
+<div class="q-title">4. 10+3*2 先算什么？</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',3)">A. 10+3</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',3)">B. 3*2</div>
+<div class="quiz-option" onclick="checkChoice(this,'B',3)">C. 10*2</div>
+<p class="quiz-result" id="res3"></p>
+</div>
+
+<div class="quiz-question">
+<div class="q-title">5. 填空：int s = a __ b; // 让s等于a加b</div>
+<input class="quiz-input" id="fill0" placeholder="填这里">
+<button class="btn btn-run" style="margin-left:8px;padding:6px 16px;font-size:14px" onclick="checkFill('+','0','fill0','res4')">OK</button>
+<p class="quiz-result" id="res4"></p>
+</div>
+
+<div id="resultBanner"></div>
+</div>
+
+
+
+
+<div class="section" <div class="card summary-card">
+<h2>🏆 Day 4 Complete!</h2>
+<div style="text-align:center;padding:20px 0">
+<div style="font-size:64px;animation:popIn .6s ease">🧮</div>
+<h3 style="color:var(--purple);margin-top:8px">🎉 Earned: Math Wizard Badge!</h3>
+<p style="color:var(--text2)">+110 points earned!</p>
+</div>
+<div class="tomorrow-preview">
+<h3>🚀 Tomorrow: Day 5: if/else (make choices!)</h3>
+</div>
+<div style="text-align:center;margin-top:20px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+<button class="btn btn-back" onclick="showSection(3)">◀ Back</button>
+<button class="btn btn-export" onclick="exportScoresCSV()">💾 Save Score</button>
+</div>
+</div>
+';
+
+}
+
+
+
+// 测验
+
+function checkChoice(el,correct,q){
+
+  if(quizAnswers['q'+q]) return;
+
+  var allOpts = el.parentElement.querySelectorAll('.quiz-option');
+
+  if(el.textContent.indexOf(correct) !== -1){
+
+    el.classList.add('correct');
+
+    quizAnswers['q'+q] = true;
+
+    quizScores['q'+q] = 5;
+
+    el.innerHTML += '<span style="float:right"> 正确!</span>';
+
+  } else {
+
+    el.classList.add('wrong');
+
+    quizAnswers['q'+q] = false;
+
+    el.innerHTML += '<span style="float:right"> 再想想</span>';
+
+    allOpts.forEach(function(o){if(o.textContent.indexOf(correct)!==-1) o.classList.add('correct')});
+
+  }
+
+  allOpts.forEach(function(o){o.style.pointerEvents='none'});
+
+}
+
+
+
+function checkFill(){
+
+  var ans = document.getElementById('fillBlank').value.trim();
+
+  var res = document.getElementById('fillResult');
+
+  if(ans === 'cout'){
+
+    res.innerHTML = ' 正确！加10分！'; res.style.color = '#28A745';
+
+    quizAnswers.q4 = true; quizScores.q4 = 10;
+
+    document.getElementById('fillBlank').disabled = true;
+
+  } else {
+
+    res.innerHTML = ' 提示：输出工具是 cout（4个字母）'; res.style.color = '#DC3545';
+
+  }
+
+}
+
+
+
+function runQuizCode(){
+
+  var code = document.getElementById('quizEditor').value;
+
+  var res = document.getElementById('quizCodeResult');
+
+  if(code.includes('cout') && code.includes(';') && code.length > 20){
+
+    res.innerHTML = ' 代码看起来不错！写出了完整程序！+10分';
+
+    res.style.color = '#28A745';
+
+    quizAnswers.q5 = true; quizScores.q5 = 10;
+
+  } else if(code.length > 5){
+
+    res.innerHTML = ' 有进步！确保包含 cout 和分号就完美了！+5分';
+
+    res.style.color = '#FF8C00';
+
+    quizAnswers.q5 = true; quizScores.q5 = 5;
+
+  } else {
+
+    res.innerHTML = ' 再加把劲！写至少一行 cout << "你的介绍";';
+
+    res.style.color = '#DC3545';
+
+  }
+
+}
+
+
+
+function completeQuiz(){
+
+  var total = 0;
+
+  for(var k in quizScores) total += quizScores[k] || 0;
+
+  var msg = '测验得分: ' + total + '/40! ';
+
+  if(total >= 30) msg += '太棒了！';
+
+  else if(total >= 15) msg += '不错哦！';
+
+  else msg += '继续加油！';
+
+  alert(msg);
+
+  saveProgress();
+
+  showSection(4);
+
+  updateAchievement();
+
+}
+
+
+
+// 积分系统
+
+function getPoints(){return parseInt(localStorage.getItem('eggy_cpp_points') || '0')}
+
+function addPoints(amt){var p = getPoints() + amt; localStorage.setItem('eggy_cpp_points',String(p)); document.getElementById('pointsDisplay').textContent = p}
+
+function saveProgress(){localStorage.setItem('eggy_cpp_day1_done','true'); if(getPoints() === 0) addPoints(50); document.getElementById('dayProgress').style.width = '0.4%'}
+
+function loadProgress(){var p = getPoints(); document.getElementById('pointsDisplay').textContent = p; document.getElementById('achievementPoints').textContent = p}
+
+function updateAchievement(){var p = getPoints(); document.getElementById('badgeDisplay').innerHTML = '<span>🌱</span> 新芽蛋仔'; document.getElementById('achievementPoints').textContent = p}
+
+function resetAll(){if(confirm('清除所有进度，重新学习？')){localStorage.clear();location.reload()}}
+
+function escHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+
+</script>
+
+
+<!-- ====== Day Navigation Bar ====== -->
+<div class="day-nav-section" style="background:linear-gradient(135deg,#FFF5F9,#F5F0FF);border-radius:20px;padding:20px;margin-top:24px;text-align:center;border:2px solid #F0E6F6">
+  <p style="font-size:14px;color:#888;margin-bottom:10px">📅 14-Day C++ Adventure</p>
+  <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap">
+    <span style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;font-size:14px;color:#999;border:2px solid #E0D5F0;opacity:.4">← Start</span>
+    <span style="font-size:16px;font-weight:700;color:var(--text2);background:var(--bg);padding:6px 16px;border-radius:20px;border:1px solid #E0D5F0">Day 1 / 14</span>
+    <a href="day2-lesson.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;font-size:14px;font-weight:700;text-decoration:none;color:#FFF;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;transition:all .2s">Day 2 →</a>
+  </div>
+  <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+    <button onclick="openScoreboard()" style="background:linear-gradient(135deg,var(--yellow),#FFC107);color:#333;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">📊 Score Board</button>
+    <button onclick="saveToCloud()" style="background:linear-gradient(135deg,var(--mintLime, #00D4AA),#00B894);color:#FFF;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">☁️ Sync to Cloud</button>
+    <button onclick="loadFromCloud()" style="background:linear-gradient(135deg,var(--blue),#4A90D9);color:#FFF;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">⬇️ Load from Cloud</button>
+    <button onclick="exportScoresCSV()" style="background:linear-gradient(135deg,var(--yellow),#FFC107);color:#333;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">📊 Total Score</button>
+    <button onclick="exportScoresCSV()" style="background:#FFF;border:2px solid #E0D5F0;padding:8px 20px;border-radius:20px;cursor:pointer;font-size:14px;color:#666;font-family:inherit">💾 Save Score</button>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+<!-- ====== Scoreboard Modal ====== -->
+<div id="sbOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center" onclick="this.style.display='none'">
+  <div style="background:#FFF;border-radius:20px;padding:24px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-size:20px;color:var(--purple);margin:0">📊 Score Dashboard</h3>
+      <button onclick="document.getElementById('sbOverlay').style.display='none'" style="border:none;background:none;font-size:22px;cursor:pointer;color:#999">&times;</button>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="background:var(--purple);color:#FFF"><th style="padding:8px;text-align:left">Day</th><th style="padding:8px">Status</th><th style="padding:8px">Score</th></tr></thead>
+      <tbody id="sbBody" style="display:contents"></tbody>
+    </table>
+    <p style="font-size:11px;color:#999;text-align:center;margin-top:10px">Scores stored in your browser. Sync app coming soon!</p>
+  </div>
+</div>
+
+
 <script>
-let editor, currentSection = 0;
-window.addEventListener('load',function(){
-  if(document.getElementById('codeEditor')){
-    editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'),{mode:'text/x-c++src',theme:'dracula',lineNumbers:true,indentUnit:4});
-    editor.setSize(null,220);
-    let p = parseInt(localStorage.getItem('eggy_points')||'0');
-    document.getElementById('pointsDisplay').textContent = p;
-  }
-});
-function showSection(i){currentSection=i;document.querySelectorAll('.section').forEach((s,j)=>s.classList.toggle('active',j===i));document.querySelectorAll('.step-btn').forEach((b,j)=>b.classList.toggle('active',j===i));window.scrollTo({top:0,behavior:'smooth'});}
-function revealStory(el){el.classList.add('revealed')}
-function runCode(){
-  if(!editor)return;
-  let code=editor.getValue(),output=[],vars={};
-  code.split('\n').forEach(line=>{
-    line=line.trim();
-    if(!line||line.startsWith('//')||line.startsWith('#')||line.startsWith('using')||line==='int main(){'||line==='{'||line.startsWith('return')||line==='}')return;
-    let m1=line.match(/^int\s+(\w+)\s*=\s*(\d+)/);
-    if(m1){vars[m1[1]]=parseInt(m1[2]);return;}
-    let m2=line.match(/^string\s+(\w+)\s*=\s*"([^"]*)"/);
-    if(m2){vars[m2[1]]=m2[2];return;}
-    let m3=line.match(/cin\s*>>\s*(\w+)/);
-    if(m3){vars[m3[1]]=prompt('请输入 '+m3[1]+':')||'0';return;}
-    let m4=line.match(/cout\s*<<(.+);/);
-    if(m4){
-      let parts=m4[1].split('<<').map(p=>p.trim());
-      parts.forEach(p=>{
-        if(p==='endl')output.push('\n');
-        else if(p.startsWith('"')&&p.endsWith('"'))output.push(p.slice(1,-1));
-        else if(vars.hasOwnProperty(p))output.push(vars[p]);
-        else if(p.match(/^[\d\.+*/-]/))output.push(eval(p.replace(/(\w+)/g,m=>vars[m]||m)));
-      });
+// ====== Scoreboard System ======
+(function(){
+  if(window._scoreboardInited)return; window._scoreboardInited=true;
+  var DAY=parseInt(document.querySelector('.day-badge')?.textContent?.match(/\d+/)?.[0] || '1');
+  
+  window.getScore=function(d){return parseInt(localStorage.getItem('egg_score_d'+d)||'0')}
+  window.setScore=function(d,v){localStorage.setItem('egg_score_d'+d,v.toString());localStorage.setItem('egg_score_done_d'+d,'1')}
+  
+  window.openScoreboard=function(){
+    var t=document.getElementById('sbBody');
+    if(!t)return;
+    var html='',total=0;
+    for(var i=1;i<=14;i++){
+      var s=getScore(i);
+      total+=s;
+      var done=localStorage.getItem('egg_score_done_d'+i);
+      html+='<tr style="border-bottom:1px solid #F0E6F6"><td style="padding:8px">Day '+i+'</td><td style="padding:8px;text-align:center">'+(done?'⭐':'⬜')+'</td><td style="padding:8px;text-align:center">'+s+'</td></tr>';
     }
-  });
-  let panel=document.getElementById('outputPanel');
-  if(panel)panel.innerHTML=output.length?'<span style="color:#00FF88">'+output.join('').replace(/\n/g,'<br>')+'</span>':'<span style="color:#FF6B6B">无输出，检查代码~</span>';
-}
-function checkChoice(el,correct,q){
-  if(window['q'+q+'_done'])return;
-  if(el.textContent.startsWith(correct)){el.classList.add('correct');window['q'+q+'_done']=true;el.innerHTML+=' 正确!';}
-  else{el.classList.add('wrong');el.innerHTML+=' 再想想';}
-  el.parentElement.querySelectorAll('.quiz-option').forEach(o=>o.style.pointerEvents='none');
-}
-function showHint(){let p=document.getElementById('outputPanel');if(p)p.innerHTML='<span style="color:#FFD700">提示：检查 cout/cin 语法，分号不要漏！</span>';}
+    html+='<tr style="font-weight:700;background:#F0E6F6"><td colspan="2" style="padding:8px">TOTAL</td><td style="padding:8px;text-align:center">'+total+'</td></tr>';
+    t.innerHTML=html;
+    var overlay=document.getElementById('sbOverlay');
+    if(overlay){overlay.style.display='flex';overlay.style.justifyContent='center';overlay.style.alignItems='center'}
+  };
+  
+  window.exportScoresCSV=function(){
+    var csv='Day,Score,Done\n';
+    for(var i=1;i<=14;i++)csv+='Day '+i+','+getScore(i)+','+(localStorage.getItem('egg_score_done_d'+i)?'yes':'no')+'\n';
+    var b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='egg_cpp_scores.csv';a.click();
+  };
+  
+  // Hook into existing points system: intercept localStorage 'eggy_points' writes
+  var origSet=localStorage.setItem.bind(localStorage);
+  localStorage.setItem=function(k,v){
+    origSet(k,v);
+    if(k==='eggy_points'&&v){
+      setScore(DAY,parseInt(v)||0);
+      // Also mark done
+      localStorage.setItem('egg_score_done_d'+DAY,'1');
+    }
+  };
+  
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('sbOverlay').style.display='none';});
+})();
+</script>
+
+
+<script>
+// ====== Cloud Sync: User provides own GitHub Token ======
+(function(){
+  if(window._cloudInited)return; window._cloudInited=true;
+  
+  var API = 'https://api.github.com/repos/sivalei/xiaomaji-cpp-adventure/contents/scores.json';
+  
+  function getToken(){
+    var t = localStorage.getItem('gh_token')||'';
+    if(!t){
+      t = prompt('\u8BF7\u8F93\u5165\u4F60\u7684 GitHub Personal Access Token\n(GitHub Settings > Developer settings > PATs)\n\u6743\u9650\u9700\u8981: repo)\n\nToken \u4FDD\u5B58\u5728\u6D4F\u89C9\u5668\u672C\u5730\uFF0C\u4E0D\u4F1A\u4E0A\u4F20\u670D\u52A1\u5668:');
+      if(t) localStorage.setItem('gh_token', t.trim());
+    }
+    return t;
+  }
+  
+  window.saveToCloud = function(name){
+    name = name || prompt('\u7528\u6237\u540D:', localStorage.getItem('egg_cloud_name')||'');
+    if(!name) return;
+    var token = getToken();
+    if(!token){alert('\u9700\u8981 Token \u624D\u80FD\u4FDD\u5B58\u5230\u4E91\u7AEF');return;}
+    localStorage.setItem('egg_cloud_name', name);
+    
+    // Collect scores
+    var scores = {};
+    for(var i=1;i<=14;i++){
+      scores['d'+i] = parseInt(localStorage.getItem('egg_score_d'+i)||'0');
+      scores['done'+i] = !!localStorage.getItem('egg_score_done_d'+i);
+    }
+    scores.updated = new Date().toISOString();
+    
+    // Fetch current scores.json
+    fetch(API, {headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(!r.ok)throw new Error('Fetch failed: '+r.status);return r.json()})
+    .then(function(data){
+      var content = JSON.parse(atob(data.content));
+      if(!content.users) content.users = {};
+      content.users[name] = {name:name, scores:scores, updated:new Date().toISOString()};
+      content.last_updated = new Date().toISOString();
+      
+      return fetch(API, {
+        method:'PUT',
+        headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+        body: JSON.stringify({message:'Update '+name,content:btoa(unescape(encodeURIComponent(JSON.stringify(content,null,2)))),sha:data.sha,branch:'main'})
+      });
+    })
+    .then(function(r){if(!r.ok)throw new Error('Save failed: '+r.status);return r.json()})
+    .then(function(){alert('\u2705 \u4FDD\u5B58\u6210\u529F\uFF01\u7528\u6237: '+name)})
+    .catch(function(e){alert('\u274C \u4FDD\u5B58\u5931\u8D25: '+e.message)});
+  };
+  
+  window.loadFromCloud = function(name){
+    name = name || prompt('\u7528\u6237\u540D:', localStorage.getItem('egg_cloud_name')||'');
+    if(!name) return;
+    var token = getToken();
+    if(!token){alert('\u9700\u8981 Token \u624D\u80FD\u4ECE\u4E91\u7AEF\u52A0\u8F7D');return;}
+    
+    fetch(API, {headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(!r.ok)throw new Error('Fetch failed');return r.json()})
+    .then(function(data){
+      var content = JSON.parse(atob(data.content));
+      if(!content.users||!content.users[name]){alert('\u672A\u627E\u5230\u7528\u6237: '+name);return;}
+      var sc = content.users[name].scores;
+      for(var i=1;i<=14;i++){
+        if(sc['d'+i])localStorage.setItem('egg_score_d'+i, String(sc['d'+i]));
+        if(sc['done'+i])localStorage.setItem('egg_score_done_d'+i,'1');
+      }
+      localStorage.setItem('egg_cloud_name', name);
+      alert('\u2705 \u52A0\u8F7D\u6210\u529F\uFF01\u7528\u6237: '+name+'\n\u9875\u9762\u5C06\u5237\u65B0...');
+      setTimeout(function(){location.reload()},500);
+    })
+    .catch(function(e){alert('\u274C \u52A0\u8F7D\u5931\u8D25: '+e.message)});
+  };
+})();
 </script>
 
 </body>
+
 </html>
