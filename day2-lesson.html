@@ -1,562 +1,653 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>🧰 Day 2 - Variables | 小蛋仔C++冒险岛</title>
+
+<title>🥚 Day 2 - 魔法宝箱（变量）</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+
 <style>
 
-/* ========== CSS Variables & Reset ========== */
-:root {
-  --pink: #FF6B9D; --pink2: #FF85B3; --purple: #C44AFF; --purple2: #D066FF;
-  --yellow: #FFD700; --yellow2: #FFE44D; --orange: #FF8C42; --mint: #00D4AA;
-  --mint2: #00E6B8; --blue: #5B9BD5; --blue2: #6AADF0;
-  --bg: #FFF5F9; --card: #FFF; --text: #333; --text2: #666;
-  --shadow: 0 4px 20px rgba(0,0,0,.08); --radius: 20px;
-}
+:root{--pink:#FF6B9D;--purple:#C44AFF;--yellow:#FFD700;--mint:#00D4AA;--blue:#5B9BD5;--bg:#FFF5F9;--cardBg:#FFF;--text:#333;--shadow:0 4px 20px rgba(0,0,0,.08);--radius:20px}
+
 *{margin:0;padding:0;box-sizing:border-box}
-body{
-  font-family:"Microsoft YaHei","PingFang SC","Segoe UI",sans-serif;
-  font-size:18px; background:var(--bg); color:var(--text); line-height:1.7;
-  background-image:
-    radial-gradient(circle at 10% 10%, rgba(255,107,157,.08) 0%, transparent 50%),
-    radial-gradient(circle at 90% 90%, rgba(196,74,255,.06) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(255,215,0,.04) 0%, transparent 60%);
-}
-h2{font-size:26px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-h3{font-size:20px;margin:14px 0 8px}
-p{margin:6px 0}
-.container{max-width:1100px;margin:0 auto;padding:0 16px 20px}
 
-/* Header */
-.header{
-  background:linear-gradient(135deg, var(--pink), var(--purple));
-  color:#FFF; padding:14px 24px;
-  display:flex; align-items:center; justify-content:space-between;
-  flex-wrap:wrap; gap:10px;
-  box-shadow:0 2px 12px rgba(255,107,157,.3);
-  border-radius:0 0 var(--radius) var(--radius);
-}
-.logo{font-size:24px;font-weight:700;display:flex;align-items:center;gap:8px}
-.logo-icon{font-size:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2))}
-.header-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.day-badge{background:var(--yellow);color:#333;padding:4px 14px;border-radius:20px;font-weight:700;font-size:14px}
-.points-display{font-size:18px;font-weight:700;display:flex;align-items:center;gap:4px}
-.btn-scores{
-  background:rgba(255,255,255,.25); color:#FFF; border:1px solid rgba(255,255,255,.4);
-  padding:6px 14px; border-radius:20px; cursor:pointer; font-size:14px; font-weight:600;
-  font-family:inherit; transition:all .2s;
-}
-.btn-scores:hover{background:rgba(255,255,255,.4)}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;font-size:18px;background:var(--bg);color:var(--text);line-height:1.7}
 
-/* Step nav */
-.step-nav{
-  display:flex; gap:6px; justify-content:center; padding:18px 0 10px;
-  flex-wrap:wrap; position:relative;
-}
-.step-btn{
-  padding:9px 18px; border-radius:25px; border:2px solid #E0D5F0;
-  background:#FFF; cursor:pointer; font-size:15px; font-weight:600;
-  transition:all .3s; color:#999; font-family:inherit;
-}
-.step-btn.active{
-  background:linear-gradient(135deg,var(--pink),var(--purple));
-  color:#FFF; border-color:transparent; transform:scale(1.05);
-}
-.step-btn.done{background:var(--mint);color:#FFF;border-color:transparent}
+.container{max-width:1100px;margin:0 auto;padding:20px}
 
-.section{display:none;animation:fadeIn .4s ease}
-.section.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.header{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;padding:16px 30px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;box-shadow:0 2px 12px rgba(255,107,157,.3);border-radius:0 0 var(--radius) var(--radius)}
 
-/* Cards */
-.card{
-  background:var(--card); border-radius:var(--radius);
-  padding:26px 28px; box-shadow:var(--shadow); margin-bottom:16px;
-  border:2px solid #F0E6F6;
-}
-.card-stories{border-left:5px solid var(--pink)}
-.card-concepts{border-left:5px solid var(--purple)}
-.card-code{border-left:5px solid var(--blue)}
-.card-quiz{border-left:5px solid var(--orange)}
-.card-summary{border-left:5px solid var(--mint)}
+.logo{font-size:26px;font-weight:700;display:flex;align-items:center;gap:8px}
 
-/* Story steps */
-.story-step{
-  cursor:pointer; padding:14px 18px; margin:6px 0; border-radius:12px;
-  background:#FFF0F5; border:2px dashed var(--pink);
-  transition:all .3s; display:flex; align-items:flex-start; gap:12px;
-}
-.story-step:hover{transform:translateX(4px);background:#FFE4EE}
+.header-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+
+.points-display{font-size:20px;font-weight:700;display:flex;align-items:center;gap:6px}
+
+.progress-bar-wrap{background:rgba(255,255,255,.3);border-radius:10px;height:10px;width:150px}
+
+.progress-bar{background:var(--yellow);height:100%;border-radius:10px;transition:width .5s}
+
+.day-badge{background:var(--yellow);color:#333;padding:4px 14px;border-radius:20px;font-weight:700;font-size:15px}
+
+.step-nav{display:flex;gap:6px;justify-content:center;padding:20px 0;flex-wrap:wrap}
+
+.step-btn{padding:10px 20px;border-radius:25px;border:2px solid #E0D5F0;background:#FFF;cursor:pointer;font-size:16px;font-weight:600;transition:all .3s;color:#999;font-family:inherit}
+
+.step-btn.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#FFF;border-color:transparent;transform:scale(1.05)}
+
+.section{display:none;animation:fadeIn .5s ease}.section.active{display:block}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.card{background:var(--cardBg);border-radius:var(--radius);padding:30px;box-shadow:var(--shadow);margin-bottom:20px;border:2px solid #F0E6F6}
+
+.story-card{border-left:5px solid var(--pink)}
+
+.concept-card{border-left:5px solid var(--purple)}
+
+.code-card{border-left:5px solid var(--blue)}
+
+.quiz-card{border-left:5px solid var(--orange)}
+
+.summary-card{border-left:5px solid var(--mint)}
+
+.story-step{cursor:pointer;padding:16px 20px;margin:8px 0;border-radius:12px;background:#FFF0F5;border:2px dashed var(--pink);transition:all .3s;display:flex;align-items:flex-start;gap:14px}
+
+.story-step:hover{transform:translateX(5px);background:#FFE4EE}
+
 .story-step.revealed{background:#FFE4EE;border-style:solid;border-color:var(--pink)}
-.step-num{font-size:26px;min-width:36px;text-align:center;color:var(--pink);font-weight:700}
 
-/* Scene illustrations */
-.scene-container{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin:16px 0}
-.scene-item{
-  background:linear-gradient(135deg,#FFF0F5,#F5F0FF);
-  border-radius:16px; padding:16px; text-align:center;
-  border:2px solid #F0E6F6; min-width:80px; flex:1; max-width:160px;
-}
-.scene-item svg{width:64px;height:64px;display:block;margin:0 auto 6px}
-.scene-label{font-size:13px;color:var(--text2);font-weight:600}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 
-/* Code blocks */
-.code-block{
-  background:#2D2D3F; color:#F8F8F2; padding:18px 20px;
-  border-radius:12px; font-size:15px; overflow-x:auto;
-  line-height:1.8; margin:10px 0; position:relative;
-}
-.code-block code{color:#F8F8F2; font-family:"Fira Code","Cascadia Code",Consolas,monospace}
-.code-tag{
-  position:absolute; top:-10px; right:12px;
-  background:var(--yellow); color:#333; padding:2px 10px;
-  border-radius:10px; font-size:12px; font-weight:700;
-}
+.tab-btn{padding:10px 22px;border-radius:25px;border:2px solid #E0D5F0;background:#FFF;cursor:pointer;font-size:17px;font-weight:600;transition:all .3s;font-family:inherit}
 
-/* Code editor area */
-.editor-wrap{margin:10px 0;border:2px solid #E0D5F0;border-radius:12px;overflow:hidden}
-.output-panel{
-  background:#1E1E2E; color:#00FF88; padding:12px 16px;
-  font-size:15px; font-family:"Fira Code",monospace;
-  min-height:50px; max-height:150px; overflow-y:auto;
-}
+.tab-btn.active{background:linear-gradient(135deg,var(--purple),#A855F7);color:#FFF;border-color:transparent}
 
-/* Buttons */
-.btn{
-  padding:10px 24px; border-radius:25px; border:none; cursor:pointer;
-  font-size:16px; font-weight:600; transition:all .3s;
-  font-family:inherit; display:inline-flex; align-items:center; gap:6px;
-}
-.btn-run{background:linear-gradient(135deg,var(--mint),#00B894);color:#FFF;box-shadow:0 2px 8px rgba(0,212,170,.3)}
-.btn-run:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,212,170,.4)}
+.tab-content{display:none;animation:fadeIn .3s}.tab-content.active{display:block}
+
+.code-block{background:#2D2D3F;color:#F8F8F2;padding:20px;border-radius:12px;font-size:15px;overflow-x:auto;line-height:1.8;margin:10px 0;font-family:"Fira Code",Consolas,monospace}
+
+.editor-layout{display:flex;gap:20px;flex-wrap:wrap}
+
+.task-panel{flex:0 0 320px;background:#FAF0FF;border-radius:12px;padding:20px}
+
+.editor-panel{flex:1;min-width:400px;border:2px solid #E0D5F0;border-radius:12px;overflow:hidden}
+
+.output-panel{background:#1E1E2E;color:#00FF88;padding:14px 18px;font-size:16px;font-family:"Fira Code",monospace;min-height:60px;max-height:150px;overflow-y:auto;border-top:2px solid #333}
+
+.btn{padding:10px 28px;border-radius:25px;border:none;cursor:pointer;font-size:17px;font-weight:600;transition:all .3s;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+
+.btn-run{background:linear-gradient(135deg,var(--mint),#00B894);color:#FFF}
+
 .btn-hint{background:#FFF;border:2px solid var(--yellow);color:#B8860B}
+
 .btn-next{background:linear-gradient(135deg,var(--blue),#4A90D9);color:#FFF}
-.btn-back{background:#FFF;border:2px solid #E0D5F0;color:var(--text2)}
-.btn-complete{background:linear-gradient(135deg,var(--purple),#A855F7);color:#FFF;box-shadow:0 2px 8px rgba(196,74,255,.3)}
-.btn-sync{background:linear-gradient(135deg,var(--orange),#FF7043);color:#FFF;box-shadow:0 2px 8px rgba(255,140,66,.3)}
-.btn-export{background:#FFF;border:2px solid var(--mint);color:#008666}
 
-/* Day navigation bar */
-.day-nav{
-  display:flex; align-items:center; justify-content:center; gap:12px;
-  padding:14px 0; margin-top:20px; flex-wrap:wrap;
-}
-.day-nav a, .day-nav button{
-  padding:10px 22px; border-radius:25px; font-size:15px; font-weight:700;
-  text-decoration:none; font-family:inherit; cursor:pointer;
-  transition:all .3s; border:none;
-  display:inline-flex; align-items:center; gap:6px;
-}
-.nav-prev{background:var(--card);border:2px solid #E0D5F0!important;color:var(--text2)}
-.nav-prev:hover{background:#F5F0FF}
-.nav-next{
-  background:linear-gradient(135deg,var(--pink),var(--purple))!important;
-  color:#FFF!important; box-shadow:0 2px 8px rgba(255,107,157,.3);
-}
-.nav-next:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(255,107,157,.4)}
-.nav-indicator{font-size:14px;color:var(--text2);font-weight:600}
+.quiz-question{padding:18px;margin:10px 0;background:#FFF9F0;border-radius:12px;border:2px solid #FFE4CC}
 
-/* Quiz */
-.quiz-q{padding:14px 18px;margin:8px 0;background:#FFF9F0;border-radius:12px;border:2px solid #FFE4CC}
-.quiz-opt{
-  padding:10px 14px;margin:4px 0;border-radius:10px;border:2px solid #E0D5F0;
-  cursor:pointer;transition:all .2s;font-size:16px;
-}
-.quiz-opt:hover{border-color:var(--orange);background:#FFF5EE}
-.quiz-opt.correct{background:#D4EDDA;border-color:#28A745!important;color:#155724}
-.quiz-opt.wrong{background:#F8D7DA;border-color:#DC3545!important;color:#721C24}
-.quiz-input{
-  padding:8px 14px;border:2px solid #E0D5F0;border-radius:10px;
-  font-size:16px;width:120px;text-align:center;font-family:monospace;
-}
-.quiz-result{font-weight:700;margin-top:6px}
+.quiz-option{padding:12px 16px;margin:6px 0;border-radius:10px;border:2px solid #E0D5F0;cursor:pointer;transition:all .2s;font-size:16px}
 
-/* Achievement popup */
-.achievement-popup{
-  display:none; position:fixed; top:30%; left:50%; transform:translate(-50%,-50%);
-  background:linear-gradient(135deg,var(--pink),var(--purple)); color:#FFF;
-  padding:24px 36px; border-radius:20px; font-size:22px; font-weight:700;
-  z-index:1000; box-shadow:0 10px 40px rgba(255,107,157,.5);
-  text-align:center; animation:popIn .5s ease;
-}
-@keyframes popIn{
-  0%{transform:translate(-50%,-50%) scale(0);opacity:0}
-  70%{transform:translate(-50%,-50%) scale(1.15);opacity:1}
-  100%{transform:translate(-50%,-50%) scale(1);opacity:1}
-}
+.quiz-option:hover{border-color:var(--orange);background:#FFF5EE}
 
-/* Score modal */
-.modal-overlay{
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,.5);
-  z-index:999; justify-content:center; align-items:center;
-}
-.modal-overlay.active{display:flex}
-.modal{
-  background:#FFF; border-radius:20px; padding:28px; max-width:500px;
-  width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2);
-}
-.modal h3{font-size:22px;margin-bottom:14px;color:var(--purple)}
-.modal table{width:100%;border-collapse:collapse;font-size:14px}
-.modal td,.modal th{padding:8px 12px;border-bottom:1px solid #F0E6F6}
-.modal th{background:var(--purple);color:#FFF;font-size:13px}
-.modal td{text-align:center}
-.modal .close-btn{
-  float:right; border:none; background:none; font-size:24px; cursor:pointer;
-  color:var(--text2); line-height:1;
-}
-.score-star{font-size:18px}
+.quiz-option.correct{background:#D4EDDA;border-color:#28A745!important}
 
-/* Review section */
-.review-card{
-  background:linear-gradient(135deg,#FFF9F0,#FFF);
-  border:1px dashed var(--yellow); border-radius:12px; padding:14px 18px; margin:8px 0;
-}
+.quiz-option.wrong{background:#F8D7DA;border-color:#DC3545!important}
 
-/* Summary */
-.summary-grid{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:12px 0}
-.summary-item{
-  background:linear-gradient(135deg,#FFF,#FFF5F9); border:2px solid #F0E6F6;
-  border-radius:14px; padding:14px 18px; text-align:center; min-width:100px; flex:1;
-  max-width:200px;
-}
-.summary-icon{font-size:40px;display:block;margin-bottom:4px}
-.summary-text{font-size:14px;font-weight:600;color:var(--text2)}
+.quiz-input{padding:10px 16px;border:2px solid #E0D5F0;border-radius:10px;font-size:16px;width:120px;text-align:center;font-family:monospace}
 
-/* Tomorrow preview */
-.tomorrow-box{
-  background:linear-gradient(135deg,#F0E6F6,#FFF0F5);
-  border-radius:14px; padding:18px; text-align:center; margin:16px 0;
-}
-.tomorrow-box h3{color:var(--purple)}
+.knowledge-card{background:linear-gradient(135deg,#FFF,#FFF5F9);padding:24px;border-radius:12px;border:3px solid var(--pink);text-align:center;max-width:320px;margin:0 auto}
 
-/* Responsive */
-@media(max-width:768px){
-  .header{flex-direction:column;text-align:center}
-  .step-nav{gap:4px}
-  .step-btn{padding:7px 14px;font-size:14px}
-  .card{padding:18px 16px}
-  .scene-item{min-width:60px;max-width:100px;padding:10px}
-  .scene-item svg{width:40px;height:40px}
-}
+.badge-icon{font-size:50px}
+
+.tomorrow-preview{background:linear-gradient(135deg,#F0E6F6,#FFF0F5);padding:20px;border-radius:12px;text-align:center}
+
+@media(max-width:768px){.editor-layout{flex-direction:column}.task-panel{flex:auto}.header{flex-direction:column;text-align:center}}
 
 </style>
+
 </head>
-<body data-day="2">
+
+<body>
+
 <div class="header">
-  <div class="logo"><span class="logo-icon">🧰</span>小蛋仔C++冒险岛</div>
-  <div class="header-right">
-    <div class="day-badge">Day 2 / 14</div>
-    <div class="points-display">💰 <span id="pointsDisplay">0</span> pts</div>
-    <button class="btn-scores" onclick="openScoreboard()">📊 Scores</button>
-  </div>
+
+<div class="logo"><span style="font-size:36px">🧰</span>小蛋仔C++冒险岛</div>
+
+<div class="header-right">
+
+<div class="day-badge">📅 Day 2 / 240</div>
+
+<div class="progress-bar-wrap"><div class="progress-bar" id="dayProgress" style="width:0.8%"></div></div>
+
+<div class="points-display">💰 <span id="pointsDisplay">0</span>分</div>
+
+</div>
+
 </div>
 
 <div class="container">
 
-<!-- Achievement popup -->
-<div class="achievement-popup" id="achievementPopup"></div>
-
-<!-- Score modal -->
-<div class="modal-overlay" id="scoreModal" onclick="closeScoreboard()">
-  <div class="modal" onclick="event.stopPropagation()">
-    <button class="close-btn" onclick="closeScoreboard()">&times;</button>
-    <h3>📊 Score Dashboard</h3>
-    <table><thead><tr><th>Day</th><th>#</th><th>Score</th></tr></thead>
-    <tbody id="scoreTableBody"></tbody></table>
-    <div style="text-align:center;margin-top:14px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-export" onclick="exportScores()">&#128190; Export CSV</button>
-    </div>
-    <p style="font-size:12px;color:var(--text2);text-align:center;margin-top:8px">Scores saved locally in browser</p>
-  </div>
-</div>
-
 <div class="step-nav">
-  <button class="step-btn active" onclick="showSection(0)">🧰 Story</button>
-  <button class="step-btn" onclick="showSection(1)">&#128214; Review</button>
-  <button class="step-btn" onclick="showSection(2)">&#128218; Concepts</button>
-  <button class="step-btn" onclick="showSection(3)">&#9000; Code</button>
-  <button class="step-btn" onclick="showSection(4)">&#9989; Quiz</button>
-  <button class="step-btn" onclick="showSection(5)">&#127775; Done</button>
+
+<button class="step-btn active" onclick="showSection(0)">🎬 故事</button>
+
+<button class="step-btn" onclick="showSection(1)">📖 概念</button>
+
+<button class="step-btn" onclick="showSection(2)">⌨️ 编码</button>
+
+<button class="step-btn" onclick="showSection(3)">✅ 测验</button>
+
+<button class="step-btn" onclick="showSection(4)">🌟 总结</button>
+
 </div>
 
-<!-- Section 0: Story -->
-<div class="section active" id="sec0">
-  <div class="card card-stories">
-    <h2>🧰 Adventure Story</h2>
-    <div class="scene-container"><div class="scene-item"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="36" rx="24" ry="28" fill="#FFF0F5" stroke="#FF6B9D" stroke-width="2"/><ellipse cx="32" cy="30" rx="18" ry="20" fill="#FFF"/><circle cx="24" cy="28" r="4" fill="#333"/><circle cx="40" cy="28" r="4" fill="#333"/><circle cx="26" cy="26" r="1.5" fill="#FFF"/><circle cx="42" cy="26" r="1.5" fill="#FFF"/><path d="M26 36 Q32 42 38 36" stroke="#FF6B9D" stroke-width="2" fill="none" stroke-linecap="round"/></svg><span class="scene-label">Little Egg</span></div><div class="scene-item"><svg viewBox="0 0 64 64"><rect x="8" y="24" width="48" height="32" rx="4" fill="#FFD700" stroke="#E6B800" stroke-width="2"/><rect x="8" y="24" width="48" height="16" rx="4" fill="#FFE44D"/><rect x="26" y="14" width="12" height="14" rx="6" fill="#FFD700" stroke="#E6B800" stroke-width="1.5"/><circle cx="20" cy="44" r="2" fill="#D4A017"/><circle cx="44" cy="44" r="2" fill="#D4A017"/></svg><span class="scene-label">Variable = Chest</span></div><div class="scene-item"><svg viewBox="0 0 64 64"><rect x="16" y="16" width="32" height="32" rx="8" fill="#C44AFF" opacity="0.3" stroke="#C44AFF" stroke-width="2"/><text x="32" y="38" text-anchor="middle" font-size="20">✨</text></svg><span class="scene-label">Store values</span></div></div>
-<p style="margin-top:12px;color:var(--purple)"><b>Little Egg finds a Treasure Chest!</b> But it's empty... He learns that variables are like <b>labeled chests</b> -- each has a name and can store different types of treasure!</p>
-<div>
-<div class="story-step" onclick="revealStory(this)"><div class="step-num">1</div><div>Little Egg finds three colored chests: one red (for numbers), one blue (for text), one green (for decimals).</div></div>
-<div class="story-step" onclick="revealStory(this)"><div class="step-num">2</div><div>"Each chest has a <b>label</b> (name) and a <b>type</b> (what fits inside): <b>int</b> for whole numbers, <b>string</b> for text, <b>double</b> for decimals!"</div></div>
-<div class="story-step" onclick="revealStory(this)"><div class="step-num">3</div><div>Little Egg stores his age in an int chest, his name in a string chest, and his score in a double chest. Now he can use them anywhere!</div></div>
-</div>
-    <div style="text-align:center;margin-top:16px">
-      <button class="btn btn-next" onclick="showSection(1)">&#128214; Review &amp; Next &#9654;</button>
-    </div>
-  </div>
+
+
+<!-- 故事 -->
+
+<div class="section active" id="section0">
+
+<div class="card story-card">
+
+<h2>🎬 故事：小蛋仔来到道具店</h2>
+
+<p style="color:#888;margin-bottom:14px">点击展开故事</p>
+
+<div class="story-step" onclick="revealStory(this)">
+
+<div style="font-size:28px">1</div>
+
+<div><p>小蛋仔来到了「代码王国的道具店」！</p><p>店长说："这里有很多<strong>宝箱</strong>，可以存放你的金币、钻石、名字！"</p></div>
+
 </div>
 
-<!-- Section 1: Review -->
-<div class="section" id="sec1">
-  <div class="card card-concepts">
-    <h2>&#128214; Review</h2>
-    <div class="review-card"><b>Review:</b> cout outputs text with arrows pointing &lt;&lt;</div>
-<p>Today we learn to <b>store information</b> -- just like saving game progress before continuing the adventure!</p>
-    <div style="text-align:center;margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-back" onclick="showSection(0)">&#9664; Back</button>
-      <button class="btn btn-next" onclick="showSection(2)">&#128218; New Concepts &#9654;</button>
-    </div>
-  </div>
+<div class="story-step" onclick="revealStory(this)">
+
+<div style="font-size:28px">2</div>
+
+<div><p>"但你要先学会怎么使用这些宝箱哦～"</p><p>店长指着三种宝箱：</p>
+
+<div class="code-block" style="margin-top:8px">🧰 整数宝箱（int）→ 存金币数量（100、50、10...）<br>🧰 小数宝箱（double）→ 存精确坐标（3.14、2.5、0.8...）<br>🧰 文字宝箱（string）→ 存名字（"小彩虹"、"蛋仔派对"...）</div>
+
 </div>
 
-<!-- Section 2: Concepts -->
-<div class="section" id="sec2">
-  <div class="card card-concepts">
-    <h2>&#128218; Today's Concepts</h2>
-    <div class="scene-container"><div class="scene-item"><svg viewBox="0 0 64 64"><rect x="8" y="24" width="48" height="32" rx="4" fill="#FFD700" stroke="#E6B800" stroke-width="2"/><rect x="8" y="24" width="48" height="16" rx="4" fill="#FFE44D"/><rect x="26" y="14" width="12" height="14" rx="6" fill="#FFD700" stroke="#E6B800" stroke-width="1.5"/><circle cx="20" cy="44" r="2" fill="#D4A017"/><circle cx="44" cy="44" r="2" fill="#D4A017"/></svg><span class="scene-label">int = whole nums</span></div><div class="scene-item"><svg viewBox="0 0 64 64"><rect x="16" y="16" width="32" height="32" rx="8" fill="#C44AFF" opacity="0.3" stroke="#C44AFF" stroke-width="2"/><text x="32" y="38" text-anchor="middle" font-size="20">✨</text></svg><span class="scene-label">string = text</span></div><div class="scene-item"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#E8F5E9" stroke="#00D4AA" stroke-width="2.5"/><text x="32" y="38" text-anchor="middle" font-size="18" fill="#008666" font-weight="700">.0</text></svg><span class="scene-label">double = decimals</span></div></div>
-<div class="code-block">
-<div class="code-tag">Variables</div>
-<code>int age = 9;            // whole number<br>string name = "Egg";    // text, needs quotes<br>double score = 95.5;    // decimal number<br><br>cout &lt;&lt; name &lt;&lt; " is " &lt;&lt; age;  // output: Egg is 9<br>cout &lt;&lt; "Score: " &lt;&lt; score;    // output: Score: 95.5</code>
-</div>
-<p style="margin-top:12px"><b>Think of variables like MINECRAFT chests:</b> each has a label (name), a type (what fits), and stored contents!</p>
-<p><code>int</code> = whole numbers (1, 99, -5). <code>string</code> = text ("hello"). <code>double</code> = numbers with decimal (3.14, 95.5).</p>
-    <div style="text-align:center;margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-back" onclick="showSection(1)">&#9664; Back</button>
-      <button class="btn btn-next" onclick="showSection(3)">&#9000; Start Coding &#9654;</button>
-    </div>
-  </div>
 </div>
 
-<!-- Section 3: Code -->
-<div class="section" id="sec3">
-  <div class="card card-code">
-    <h2>&#9000; Practice</h2>
-    <div class="code-block">
-      <div class="code-tag">Template</div>
-      <code>#include &lt;iostream&gt;<br>#include &lt;string&gt;<br>using namespace std;<br>int main() {<br>    int age = 9;<br>    string name = "Egg";<br>    double score = 95.5;<br>    cout &lt;&lt; name &lt;&lt; " is " &lt;&lt; age &lt;&lt; " years old" &lt;&lt; endl;<br>    cout &lt;&lt; "Score: " &lt;&lt; score;<br>    return 0;<br>}</code>
-    </div>
-    <div class="editor-wrap">
-      <textarea id="codeEditor">#include <iostream>
-#include <string>
+<div class="story-step" onclick="revealStory(this)">
+
+<div style="font-size:28px">3</div>
+
+<div><p>"学会变量，你就能让程序记住任何东西！"</p><p style="color:var(--pink);font-weight:700">🐣 让我们开始吧！</p></div>
+
+</div>
+
+<div style="text-align:center;margin-top:20px"><button class="btn btn-next" onclick="showSection(1)">📖 学习概念 →</button></div>
+
+</div>
+
+</div>
+
+
+
+<!-- 概念 -->
+
+<div class="section" id="section1">
+
+<div class="card concept-card">
+
+<h2>📖 概念：变量 = 宝箱</h2>
+
+<div class="tabs">
+
+<button class="tab-btn active" onclick="switchTab(0)">📦 基本概念</button>
+
+<button class="tab-btn" onclick="switchTab(1)">🔍 详解</button>
+
+<button class="tab-btn" onclick="switchTab(2)">🎮 游戏联想</button>
+
+</div>
+
+<div class="tab-content active" id="tab0">
+
+<h3>💡 变量就像蛋仔的宝箱</h3>
+
+<div class="code-block"><code>int gold = 100;      // 🧰 整数宝箱，存100金币<br>double x = 3.14;   // 🧰 小数宝箱，存坐标3.14<br>string name = "小彩虹";  // 🧰 文字宝箱，存名字</code></div>
+
+<p style="margin-top:10px">🎯 <strong>记住</strong>：变量在使用前必须先<strong>定义</strong>！</p>
+
+</div>
+
+<div class="tab-content" id="tab1">
+
+<h3>🔍 逐行解读</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:16px">
+
+<tr><th style="background:var(--purple);color:#FFF;padding:10px">代码</th><th style="background:var(--purple);color:#FFF;padding:10px">蛋仔比喻</th></tr>
+
+<tr><td style="padding:10px;border-bottom:1px solid #E0D5F0"><code>int gold = 100;</code></td><td style="padding:10px">🧰 创建一个宝箱，名字叫gold，里面放100金币</td></tr>
+
+<tr><td style="padding:10px;border-bottom:1px solid #E0D5F0"><code>gold = 200;</code></td><td style="padding:10px">📝 把宝箱里的金币改成200</td></tr>
+
+<tr><td style="padding:10px"><code>cout &lt;&lt; gold;</code></td><td style="padding:10px">📢 把宝箱里的东西拿出来展示</td></tr>
+
+</table>
+
+</div>
+
+<div class="tab-content" id="tab2">
+
+<h3>🎮 我的世界里的变量</h3>
+
+<table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:16px">
+
+<tr><th>我的世界</th><th>C++ 变量</th></tr>
+
+<tr><td style="padding:10px">🧱 方块</td><td><code>int block = 10;</code></td></tr>
+
+<tr><td style="padding:10px">❤️ 生命值</td><td><code>int hp = 20;</code></td></tr>
+
+<tr><td style="padding:10px">📛 玩家名</td><td><code>string player = "Alex";</code></td></tr>
+
+</table>
+
+</div>
+
+<div style="text-align:center;margin-top:20px">
+
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="showSection(0)">← 🎬 回看</button>
+
+<button class="btn btn-next" onclick="showSection(2)">⌨️ 动手编码 →</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- 编码 -->
+
+<div class="section" id="section2">
+
+<div class="card code-card">
+
+<h2>⌨️ 动手编码：创建你的宝箱</h2>
+
+<div class="editor-layout">
+
+<div class="task-panel">
+
+<h4>📋 任务</h4>
+
+<div style="margin-bottom:10px">
+
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0;margin:2px" onclick="switchTask(0)">任务1</button>
+
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0;margin:2px" onclick="switchTask(1)">任务2</button>
+
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0;margin:2px" onclick="switchTask(2)">任务3</button>
+
+</div>
+
+<div id="task0" class="task-item active"><p><strong>任务1️⃣：定义整数变量</strong></p><div class="code-block"><code>int gold = 100;<br>cout &lt;&lt; gold;</code></div><p class="hint" style="color:#999;font-size:14px">💡 定义整数变量用 int</p></div>
+
+<div id="task1" class="task-item"><p><strong>任务2️⃣：多个变量</strong></p><div class="code-block"><code>int gold = 100;<br>int hp = 20;<br>string name = "小彩虹";<br>cout &lt;&lt; name &lt;&lt; "有" &lt;&lt; gold &lt;&lt; "金币";</code></div></div>
+
+<div id="task2" class="task-item"><p><strong>任务3️⃣：自由创作</strong></p><p>创建你的游戏角色：名字、等级、金币、生命值</p></div>
+
+</div>
+
+<div class="editor-panel">
+
+<textarea id="codeEditor">#include &lt;iostream&gt;
+
 using namespace std;
+
 int main() {
-    int age = 9;
-    string name = "Egg";
-    double score = 95.5;
-    cout << name << " is " << age << " years old" << endl;
-    cout << "Score: " << score;
+
+    int gold = 100;
+
+    cout &lt;&lt; gold;
+
     return 0;
+
 }</textarea>
-      <textarea id="codeEditorCopy" style="display:none">#include <iostream>
-#include <string>
-using namespace std;
-int main() {
-    int age = 9;
-    string name = "Egg";
-    double score = 95.5;
-    cout << name << " is " << age << " years old" << endl;
-    cout << "Score: " << score;
-    return 0;
-}</textarea>
-    </div>
-    <div class="output-panel" id="outputPanel"><span style="color:#888">Click RUN to see results...</span></div>
-    <div style="padding:10px 0;display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-run" onclick="runCode()">&#9654; RUN</button>
-      <button class="btn btn-hint" onclick="showHint()">&#128161; HINT</button>
-    </div>
-    <div style="text-align:center;margin-top:10px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-back" onclick="showSection(2)">&#9664; Back</button>
-      <button class="btn btn-next" onclick="showSection(4)">&#9989; Quiz &#9654;</button>
-    </div>
-  </div>
-</div>
 
-<!-- Section 4: Quiz -->
-<div class="section" id="sec4">
-  <div class="card card-quiz">
-    <h2>&#9989; Quiz</h2>
-    <div class="quiz-q"><div style="font-weight:700;margin-bottom:8px">1. Store a whole number in?</div><div class="quiz-opt" onclick="checkChoice(this,'B',1)">A. string</div><div class="quiz-opt" onclick="checkChoice(this,'B',1)">B. int</div><div class="quiz-opt" onclick="checkChoice(this,'B',1)">C. double</div></div><div class="quiz-q"><div style="font-weight:700;margin-bottom:8px">2. Store text in?</div><div class="quiz-opt" onclick="checkChoice(this,'C',2)">A. int</div><div class="quiz-opt" onclick="checkChoice(this,'C',2)">B. double</div><div class="quiz-opt" onclick="checkChoice(this,'C',2)">C. string</div></div><div class="quiz-q"><div style="font-weight:700;margin-bottom:8px">3. int x = 5; cout << x outputs?</div><div class="quiz-opt" onclick="checkChoice(this,'B',3)">A. x</div><div class="quiz-opt" onclick="checkChoice(this,'B',3)">B. 5</div><div class="quiz-opt" onclick="checkChoice(this,'B',3)">C. int</div></div><div class="quiz-q"><div style="font-weight:700;margin-bottom:8px">4. cout << name << age -- name is int?</div><div class="quiz-opt" onclick="checkChoice(this,'B',4)">A. OK, outputs text</div><div class="quiz-opt" onclick="checkChoice(this,'B',4)">B. name must be string</div><div class="quiz-opt" onclick="checkChoice(this,'B',4)">C. Error</div></div><div class="quiz-q"><div style="font-weight:700;margin-bottom:8px">5. Fill: int coins; coins = ___ 100; (assign symbol)</div><input class="quiz-input" id="fill4" placeholder="fill here" maxlength="15"><button class="btn btn-run" style="margin-left:8px;padding:6px 16px;font-size:14px" onclick="checkFill('=',4,'fill4','fillRes4')">OK</button><p class="quiz-result" id="fillRes4"></p></div>
-    <div style="text-align:center;margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-back" onclick="showSection(3)">&#9664; Code</button>
-      <button class="btn btn-complete" onclick="showAchievement('&#127881; Treasure Keeper Badge','110',2)">&#127775; Complete!</button>
-    </div>
-  </div>
-</div>
+<div class="output-panel" id="outputPanel"><span style="color:#888">👇 点击运行查看输出...</span></div>
 
-<!-- Section 5: Summary -->
-<div class="section" id="sec5">
-  <div class="card card-summary">
-    <h2>&#127775; Day 2 Complete!</h2>
-    <div style="text-align:center;padding:20px 0">
-      <div style="font-size:64px;animation:popIn .6s ease">🧰</div>
-      <h3 style="color:var(--purple);margin-top:8px">Treasure Keeper Badge</h3>
-      <p style="color:var(--text2)">+110 points earned!</p>
-    </div>
-    <div class="tomorrow-box">
-      <h3>&#128640; Tomorrow: Day 3: cin input (let the computer listen!)</h3>
-    </div>
-    <div style="text-align:center;margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-      <button class="btn btn-back" onclick="showSection(4)">&#9664; Back</button>
-      <button class="btn btn-export" onclick="exportScores()">&#128190; Save Score</button>
-    </div>
-  </div>
-</div>
+<div style="padding:12px;display:flex;gap:10px;flex-wrap:wrap">
 
-<!-- Day Navigation Bar -->
-<div class="day-nav">
-  <a href="day1-lesson.html" class="nav-prev">&larr; Day 1</a>
-  <span class="nav-indicator">Day 2 / 14</span>
-  <a href="day3-lesson.html" class="nav-next">Day 3 &rarr;</a>
+<button class="btn btn-run" onclick="runCode()">🚀 运行</button>
+
+<button class="btn btn-hint" onclick="showHint()">💡 提示</button>
+
 </div>
 
 </div>
+
+</div>
+
+<div style="text-align:center;margin-top:20px">
+
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="showSection(1)">← 📖 回看</button>
+
+<button class="btn btn-next" onclick="showSection(3)">✅ 开始测验 →</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- 测验 -->
+
+<div class="section" id="section3">
+
+<div class="card quiz-card">
+
+<h2>✅ 小测验</h2>
+
+<div class="quiz-question" id="q1">
+
+<div style="font-weight:700;margin-bottom:10px">1️⃣ 定义整数变量用什么关键字？</div>
+
+<div class="quiz-option" onclick="checkChoice(this,'A',1)">A. int</div>
+
+<div class="quiz-option" onclick="checkChoice(this,'A',1)">B. double</div>
+
+<div class="quiz-option" onclick="checkChoice(this,'A',1)">C. string</div>
+
+</div>
+
+<div class="quiz-question" id="q2">
+
+<div style="font-weight:700;margin-bottom:10px">2️⃣ 哪个是字符串类型？</div>
+
+<div class="quiz-option" onclick="checkChoice(this,'C',2)">A. int</div>
+
+<div class="quiz-option" onclick="checkChoice(this,'C',2)">B. double</div>
+
+<div class="quiz-option" onclick="checkChoice(this,'C',2)">C. string</div>
+
+</div>
+
+<div class="quiz-question" id="q3">
+
+<div style="font-weight:700;margin-bottom:10px">3️⃣ 补全：让变量 gold 等于 200</div>
+
+<div class="code-block"><code>int gold = <input class="quiz-input" id="fillBlank" placeholder="填这里">;</code></div>
+
+<button class="btn" style="background:var(--orange);color:#FFF" onclick="checkFill()">✅ 提交</button>
+
+<p id="fillResult" style="margin-top:8px;font-weight:700"></p>
+
+</div>
+
+<div style="text-align:center;margin-top:20px">
+
+<button class="btn" style="background:#FFF;border:2px solid #E0D5F0" onclick="showSection(2)">← ⌨️ 再练</button>
+
+<button class="btn btn-next" onclick="completeQuiz()">🌟 完成 →</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- 总结 -->
+
+<div class="section" id="section4">
+
+<div class="card summary-card">
+
+<h2>🌟 今日总结：恭喜完成 Day 2！</h2>
+
+<div class="knowledge-card">
+
+<h4 style="color:var(--pink)">📎 今日知识</h4>
+
+<div class="code-block" style="text-align:left"><code>int x = 10;      // 整数<br>double y = 3.14; // 小数<br>string s = "hi"; // 字符串<br>cout &lt;&lt; x;       // 输出变量</code></div>
+
+</div>
+
+<div class="badge-icon" style="animation:bounceIn .6s">🧰</div>
+
+<p><strong>获得「宝箱蛋仔」徽章！</strong></p>
+
+<p style="color:#888">累计积分：<span id="achievementPoints">50</span> 分</p>
+
+<div class="tomorrow-preview">
+
+<h3>🎯 明日预告：和蛋仔对话（cin 输入）</h3>
+
+<p>明天学 <code>cin</code>，让程序听你说话！</p>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+
 <script>
-let editor;
 
-function initEditor(mode){
-  var ta=document.getElementById('codeEditor');
-  if(!ta)return;
-  editor=CodeMirror.fromTextArea(ta,{mode:'text/x-c++src',theme:'dracula',lineNumbers:true,indentUnit:4});
-  editor.setSize(null,240);
-  loadPoints();
-}
+let editor, currentSection = 0;
 
-// ---- Points system ----
-function getPoints(dayNum){
-  var s=localStorage.getItem('egg_points_d'+dayNum);
-  return s?parseInt(s):0;
-}
-function setPoints(dayNum,pts){
-  localStorage.setItem('egg_points_d'+dayNum,pts.toString());
-  var dp=document.getElementById('pointsDisplay');
-  if(dp){dp.textContent=pts;dp.style.animation='popIn .3s ease'}
-  setTimeout(function(){var d=document.getElementById('pointsDisplay');if(d)d.style.animation=''},350);
-  // Also save to all-scores tracker
-  var all=localStorage.getItem('egg_all_scores');
-  var scores=all?JSON.parse(all):{};
-  scores['day'+dayNum]=pts;
-  localStorage.setItem('egg_all_scores',JSON.stringify(scores));
-}
-function loadPoints(){
-  var day=parseInt(document.body.getAttribute('data-day')||'1');
-  var pts=getPoints(day);
-  var dp=document.getElementById('pointsDisplay');
-  if(dp)dp.textContent=pts;
-}
+const taskTemplates = [
 
-// ---- Navigation ----
-function showSection(i){
-  document.querySelectorAll('.section').forEach(function(s,j){s.classList.toggle('active',j===i)});
-  document.querySelectorAll('.step-btn').forEach(function(b,j){b.classList.toggle('active',j===i)});
-  window.scrollTo({top:0,behavior:'smooth'});
-  // Mark previous steps as done
-  document.querySelectorAll('.step-btn').forEach(function(b,j){if(j<i)b.classList.add('done')});
-}
+  '#include <iostream>\nusing namespace std;\nint main() {\n    int gold = 100;\n    cout << gold;\n    return 0;\n}',
+
+  '#include <iostream>\nusing namespace std;\nint main() {\n    int gold = 100;\n    int hp = 20;\n    string name = "小彩虹";\n    cout << name << " 有 " << gold << " 金币";\n    return 0;\n}',
+
+  '#include <iostream>\nusing namespace std;\nint main() {\n    string name = "我的蛋仔";\n    int level = 5;\n    int gold = 500;\n    cout << "角色：" << name << endl;\n    return 0;\n}'
+
+];
+
+window.addEventListener('load',function(){
+
+  editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'),{mode:'text/x-c++src',theme:'dracula',lineNumbers:true,indentUnit:4});
+
+  editor.setSize(null,260);
+
+  let p = parseInt(localStorage.getItem('eggy_points')||'0');
+
+  document.getElementById('pointsDisplay').textContent = p;
+
+  document.getElementById('achievementPoints').textContent = p;
+
+});
+
+function showSection(i){currentSection=i;document.querySelectorAll('.section').forEach((s,j)=>s.classList.toggle('active',j===i));document.querySelectorAll('.step-btn').forEach((b,j)=>b.classList.toggle('active',j===i));window.scrollTo({top:0,behavior:'smooth'});}
+
 function revealStory(el){el.classList.add('revealed')}
 
-// ---- C++ simulator ----
+function switchTab(i){document.querySelectorAll('.tab-btn').forEach((b,j)=>b.classList.toggle('active',j===i));document.querySelectorAll('.tab-content').forEach((c,j)=>c.classList.toggle('active',j===i));}
+
+function switchTask(i){document.querySelectorAll('.task-item').forEach((t,j)=>t.classList.toggle('active',j===i));if(editor)editor.setValue(taskTemplates[i]);}
+
 function runCode(){
-  if(!editor)return;
-  var code=editor.getValue(),output=[],vars={};
-  code.split('\n').forEach(function(line){
-    line=line.trim();
+
+  let code = editor.getValue(), output = [], vars = {};
+
+  code.split('\n').forEach(line=>{
+
+    line = line.trim();
+
     if(!line||line.startsWith('//')||line.startsWith('#')||line.startsWith('using')||line==='int main(){'||line==='{'||line.startsWith('return')||line==='}')return;
-    var m=line.match(/^int\s+(\w+)\s*=\s*(\d+)/);
-    if(m){vars[m[1]]=parseInt(m[2]);return;}
-    m=line.match(/^string\s+(\w+)\s*=\s*"([^"]*)"/);
-    if(m){vars[m[1]]=m[2];return;}
-    m=line.match(/^double\s+(\w+)\s*=\s*([\d.]+)/);
-    if(m){vars[m[1]]=parseFloat(m[2]);return;}
-    m=line.match(/cin\s*>>\s*(\w+)/);
-    if(m){vars[m[1]]=prompt('Please input '+m[1]+':')||'0';return;}
-    m=line.match(/cout\s*<<(.+);/);
-    if(m){
-      var parts=m[1].split('<<').map(function(p){return p.trim()});
-      parts.forEach(function(p){
+
+    let m1 = line.match(/^int\s+(\w+)\s*=\s*(\d+)/);
+
+    if(m1){vars[m1[1]]=parseInt(m1[2]);return;}
+
+    let m2 = line.match(/^string\s+(\w+)\s*=\s*"([^"]*)"/);
+
+    if(m2){vars[m2[1]]=m2[2];return;}
+
+    let m3 = line.match(/cout\s*<<(.+);/);
+
+    if(m3){
+
+      let parts = m3[1].split('<<').map(p=>p.trim());
+
+      parts.forEach(p=>{
+
         if(p==='endl')output.push('\n');
+
         else if(p.startsWith('"')&&p.endsWith('"'))output.push(p.slice(1,-1));
+
         else if(vars.hasOwnProperty(p))output.push(vars[p]);
-        else try{output.push(eval(p.replace(/(\w+)/g,function(m){return vars[m]||m})))}catch(e){output.push(p)}
+
       });
+
     }
+
   });
-  var op=document.getElementById('outputPanel');
-  if(op)op.innerHTML=output.length?'<span style="color:#00FF88">'+output.join('').replace(/\n/g,'<br>')+'</span>':'<span style="color:#FF6B6B">No output - check code!</span>';
+
+  document.getElementById('outputPanel').innerHTML = output.length?'<span style="color:#00FF88">'+output.join('').replace(/\n/g,'<br>')+'</span>':'<span style="color:#FF6B6B">无输出</span>';
+
 }
 
-function showHint(){var op=document.getElementById('outputPanel');if(op)op.innerHTML='<span style="color:#FFD700">Hint: check syntax, semicolons, and cout/cin arrows!</span>'}
+function showHint(){document.getElementById('outputPanel').innerHTML='<span style="color:#FFD700">💡 提示：int定义整数，string定义文字，cout输出</span>';}
 
-// ---- Quiz ----
 function checkChoice(el,correct,q){
+
   if(window['q'+q+'_done'])return;
-  if(el.textContent.trim().startsWith(correct)){el.classList.add('correct');window['q'+q+'_done']=true;el.innerHTML+=' OK'}
-  else{el.classList.add('wrong');el.innerHTML+=' Retry'}
-  var opts=el.parentElement.querySelectorAll('.quiz-opt');
-  for(var i=0;i<opts.length;i++)opts[i].style.pointerEvents='none';
+
+  let parent = el.parentElement;
+
+  if(el.textContent.startsWith(correct)){el.classList.add('correct');window['q'+q+'_done']=true;el.innerHTML+=' ✅';}
+
+  else{el.classList.add('wrong');parent.querySelectorAll('.quiz-option').forEach(o=>{if(o.textContent.startsWith(correct))o.classList.add('correct');});}
+
+  parent.querySelectorAll('.quiz-option').forEach(o=>o.style.pointerEvents='none');
+
 }
 
-function checkFill(correct,q,inputId,resultId){
-  var ans=document.getElementById(inputId).value.trim();
-  var res=document.getElementById(resultId);
-  if(ans===correct){res.textContent='OK!';res.style.color='#28A745'}
-  else{res.textContent='Hint: '+correct;res.style.color='#DC3545'}
+function checkFill(){
+
+  let ans = document.getElementById('fillBlank').value.trim();
+
+  let res = document.getElementById('fillResult');
+
+  if(ans==='200'){res.textContent='✅ 正确！';res.style.color='#28A745';} else {res.textContent='💪 提示：=右边填200';res.style.color='#DC3545';}
+
 }
 
-// ---- Achievement popup ----
-function showAchievement(msg,pts,dayNum){
-  var popup=document.getElementById('achievementPopup');
-  var dp=document.getElementById('pointsDisplay');
-  if(popup){
-    popup.innerHTML=msg+'<br><span style="font-size:16px;font-weight:400;margin-top:6px;display:block">Earned +'+pts+' points!</span>';
-    popup.style.display='block';
-    setTimeout(function(){popup.style.display='none'},3000);
-  }
-  setPoints(dayNum,pts);
+function completeQuiz(){
+
+  let p = parseInt(localStorage.getItem('eggy_points')||'0');
+
+  if(p===0){localStorage.setItem('eggy_points','100');document.getElementById('pointsDisplay').textContent='100';document.getElementById('achievementPoints').textContent='100';}
+
+  showSection(4);
+
 }
 
-// ---- Score dashboard modal ----
-function openScoreboard(){
-  document.getElementById('scoreModal').classList.add('active');
-  renderScoreTable();
-}
-function closeScoreboard(){document.getElementById('scoreModal').classList.remove('active')}
-function renderScoreTable(){
-  var tbody=document.getElementById('scoreTableBody');
-  if(!tbody)return;
-  var all=localStorage.getItem('egg_all_scores');
-  var scores=all?JSON.parse(all):{};
-  var total=0,html='';
-  for(var i=1;i<=14;i++){
-    var s=scores['day'+i]||0;
-    total+=s;
-    var star=s>0?(s>=150?'🌟🌟🌟':s>=100?'🌟🌟':'⭐'):'⬜';
-    html+='<tr><td>Day '+i+'</td><td>'+star+'</td><td>'+s+'</td></tr>';
-  }
-  html+='<tr style="font-weight:700;background:#F0E6F6"><td colspan="2">TOTAL</td><td>'+total+'</td></tr>';
-  tbody.innerHTML=html;
-}
-
-// ---- Export scores ----
-function exportScores(){
-  var all=localStorage.getItem('egg_all_scores');
-  var scores=all?JSON.parse(all):{};
-  var text='Day,Scores\n';
-  for(var i=1;i<=14;i++)text+='Day '+i+','+(scores['day'+i]||0)+'\n';
-  var blob=new Blob([text],{type:'text/csv;charset=utf-8'});
-  var a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download='egg_cpp_scores.csv';
-  a.click();
-}
-
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeScoreboard()});
 </script>
 
-<script>initEditor();</script>
+
+<!-- ====== Day Navigation Bar ====== -->
+<div class="day-nav-section" style="background:linear-gradient(135deg,#FFF5F9,#F5F0FF);border-radius:20px;padding:20px;margin-top:24px;text-align:center;border:2px solid #F0E6F6">
+  <p style="font-size:14px;color:#888;margin-bottom:10px">📅 14-Day C++ Adventure</p>
+  <div style="display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap">
+    <a href="day1-lesson.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;font-size:14px;font-weight:700;text-decoration:none;color:var(--text2);background:var(--cardBg);border:2px solid #E0D5F0;transition:all .2s">← Day 1</a>
+    <span style="font-size:16px;font-weight:700;color:var(--text2);background:var(--bg);padding:6px 16px;border-radius:20px;border:1px solid #E0D5F0">Day 2 / 14</span>
+    <a href="day3-lesson.html" style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:20px;font-size:14px;font-weight:700;text-decoration:none;color:#FFF;background:linear-gradient(135deg,var(--pink),var(--purple));border:none;transition:all .2s">Day 3 →</a>
+  </div>
+  <div style="margin-top:12px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+    <button onclick="openScoreboard()" style="background:linear-gradient(135deg,var(--yellow),#FFC107);color:#333;border:none;padding:8px 20px;border-radius:20px;cursor:pointer;font-weight:700;font-size:14px;font-family:inherit">📊 Total Score</button>
+    <button onclick="exportScoresCSV()" style="background:#FFF;border:2px solid #E0D5F0;padding:8px 20px;border-radius:20px;cursor:pointer;font-size:14px;color:#666;font-family:inherit">💾 Save Score</button>
+  </div>
+</div>
+
+<!-- ====== Scoreboard Modal ====== -->
+<div id="sbOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center" onclick="this.style.display='none'">
+  <div style="background:#FFF;border-radius:20px;padding:24px;max-width:420px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-size:20px;color:var(--purple);margin:0">📊 Score Dashboard</h3>
+      <button onclick="document.getElementById('sbOverlay').style.display='none'" style="border:none;background:none;font-size:22px;cursor:pointer;color:#999">&times;</button>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="background:var(--purple);color:#FFF"><th style="padding:8px;text-align:left">Day</th><th style="padding:8px">Status</th><th style="padding:8px">Score</th></tr></thead>
+      <tbody id="sbBody" style="display:contents"></tbody>
+    </table>
+    <p style="font-size:11px;color:#999;text-align:center;margin-top:10px">Scores stored in your browser. Sync app coming soon!</p>
+  </div>
+</div>
+
+
+<script>
+// ====== Scoreboard System ======
+(function(){
+  if(window._scoreboardInited)return; window._scoreboardInited=true;
+  var DAY=parseInt(document.querySelector('.day-badge')?.textContent?.match(/\d+/)?.[0] || '1');
+  
+  window.getScore=function(d){return parseInt(localStorage.getItem('egg_score_d'+d)||'0')}
+  window.setScore=function(d,v){localStorage.setItem('egg_score_d'+d,v.toString());localStorage.setItem('egg_score_done_d'+d,'1')}
+  
+  window.openScoreboard=function(){
+    var t=document.getElementById('sbBody');
+    if(!t)return;
+    var html='',total=0;
+    for(var i=1;i<=14;i++){
+      var s=getScore(i);
+      total+=s;
+      var done=localStorage.getItem('egg_score_done_d'+i);
+      html+='<tr style="border-bottom:1px solid #F0E6F6"><td style="padding:8px">Day '+i+'</td><td style="padding:8px;text-align:center">'+(done?'⭐':'⬜')+'</td><td style="padding:8px;text-align:center">'+s+'</td></tr>';
+    }
+    html+='<tr style="font-weight:700;background:#F0E6F6"><td colspan="2" style="padding:8px">TOTAL</td><td style="padding:8px;text-align:center">'+total+'</td></tr>';
+    t.innerHTML=html;
+    var overlay=document.getElementById('sbOverlay');
+    if(overlay){overlay.style.display='flex';overlay.style.justifyContent='center';overlay.style.alignItems='center'}
+  };
+  
+  window.exportScoresCSV=function(){
+    var csv='Day,Score,Done\n';
+    for(var i=1;i<=14;i++)csv+='Day '+i+','+getScore(i)+','+(localStorage.getItem('egg_score_done_d'+i)?'yes':'no')+'\n';
+    var b=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='egg_cpp_scores.csv';a.click();
+  };
+  
+  // Hook into existing points system: intercept localStorage 'eggy_points' writes
+  var origSet=localStorage.setItem.bind(localStorage);
+  localStorage.setItem=function(k,v){
+    origSet(k,v);
+    if(k==='eggy_points'&&v){
+      setScore(DAY,parseInt(v)||0);
+      // Also mark done
+      localStorage.setItem('egg_score_done_d'+DAY,'1');
+    }
+  };
+  
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('sbOverlay').style.display='none';});
+})();
+</script>
+
 </body>
+
 </html>
